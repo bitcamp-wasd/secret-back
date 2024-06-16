@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: gateway
+
+  config:
+    #    config server host
+    import: optional:configserver:http://localhost:8082
+
+  profiles:
+    active: ${profile.type}
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8081/eureka/
+    register-with-eureka: true
+    fetch-registry: true
