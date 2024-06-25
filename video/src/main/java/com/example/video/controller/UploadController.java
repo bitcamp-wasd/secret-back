@@ -13,4 +13,9 @@ public class UploadController {
         return "test string fucnk";
     }
 
+
+    @GetMapping
+    public void upload() {
+
+    }
 }

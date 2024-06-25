@@ -16,9 +16,6 @@ public class Video {
     @Column(name="video_path")
     private String videoPath;
 
-    @Column(name="sheet_music")
-    private String sheet_music;
-
     private String description;
 
     private Long length;
