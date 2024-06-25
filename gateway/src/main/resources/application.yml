@@ -6,6 +6,8 @@ spring:
     #    config server host
     import: optional:configserver:http://localhost:8082
 
+
   profiles:
-    active: ${setting.profile.type}
+    active: test
+#    active: ${setting.profile.type}
 
