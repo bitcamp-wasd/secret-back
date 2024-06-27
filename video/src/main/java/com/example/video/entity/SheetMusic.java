@@ -2,11 +2,14 @@ package com.example.video.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class SheetMusic {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,5 +22,11 @@ public class SheetMusic {
 
     private String path;
 
+    @CreationTimestamp
     private LocalDateTime uploadTime;
+
+    public SheetMusic(Video video, String path) {
+        this.video = video;
+        this.path = path;
+    }
 }

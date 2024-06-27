@@ -3,6 +3,8 @@ package com.example.video.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -10,6 +12,8 @@ import java.util.List;
 
 @Getter
 @Entity
+@NoArgsConstructor
+@DynamicInsert
 public class Post {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +28,7 @@ public class Post {
     private Category category;
 
     @Column(name="thumbnail_path")
-    private String thumbnail_path;
+    private String thumbnailPath;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="video_id")
@@ -36,10 +40,22 @@ public class Post {
     @Column(name="upload_date")
     private LocalDate uploadDate;
 
+    @ColumnDefault("0")
     private Long views;
 
 
     @OneToMany(mappedBy = "post")
     private List<PostComment> postComment;
+
+
+    public Post(String title,Category category, String thumbnailPath, Video video, String userNickname) {
+        this.title = title;
+        this.category = category;
+        this.thumbnailPath = thumbnailPath;
+        this.video = video;
+        this.userNickname = userNickname;
+        this.uploadDate = LocalDate.now();
+    }
+
 
 }
