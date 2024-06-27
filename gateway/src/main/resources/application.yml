@@ -8,6 +8,6 @@ spring:
 
 
   profiles:
-    active: test
-#    active: ${setting.profile.type}
+    active: ${setting.profile.type}
+
 

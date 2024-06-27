@@ -4,9 +4,13 @@ import com.example.video.entity.state.VideoState;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
+
+import java.util.List;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class Video {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,16 +22,27 @@ public class Video {
 
     private String description;
 
-    private Long length;
+    private int length;
 
     @Column(name="like_count")
+    @ColumnDefault("0")
     private Long likeCount;
 
     @Column(name="comment_count")
-    private Long commnetCount;
+    @ColumnDefault("0")
+    private Long commentCount;
 
     @Enumerated(EnumType.STRING)
     private VideoState state;
 
 
+    @OneToMany(mappedBy = "video")
+    List<SheetMusic> sheetMusicList;
+
+    public Video(String videoPath, String description, int length) {
+        this.videoPath = videoPath;
+        this.description = description;
+        this.length = length;
+        this.state = VideoState.UPLOADING;
+    }
 }
