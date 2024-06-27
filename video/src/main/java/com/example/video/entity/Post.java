@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -12,6 +13,7 @@ import java.util.List;
 @Getter
 @Entity
 @NoArgsConstructor
+@DynamicInsert
 public class Post {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

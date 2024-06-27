@@ -5,12 +5,14 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 
 import java.util.List;
 
 @Entity
 @Getter
 @NoArgsConstructor
+@DynamicInsert
 public class Video {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

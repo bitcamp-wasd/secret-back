@@ -16,6 +16,7 @@ import com.example.video.repository.CategoryRepository;
 import com.example.video.repository.PostRepository;
 import com.example.video.repository.SheetMusicRepository;
 import com.example.video.repository.VideoRepository;
+import jakarta.persistence.PrePersist;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -54,6 +55,7 @@ public class PostService {
      * @param postRegisterDto
      * @return 각 동영상, 이미지의 Presigned URL 반환
      */
+    @PrePersist
     public PostResponseDto posting(PostRegisterDto postRegisterDto) {
 
         // 파일 별 uuid 생성
@@ -141,7 +143,7 @@ public class PostService {
 
         // 저장할 bucket 이름, 허용할 RestApi 방법, Presigned url 만료 시간 지정
         GeneratePresignedUrlRequest generatePresignedUrlRequest =
-                new GeneratePresignedUrlRequest(videoBucket, imageName)
+                new GeneratePresignedUrlRequest(bucket, imageName)
                         .withMethod(HttpMethod.PUT)
                         .withExpiration(expiration);
 

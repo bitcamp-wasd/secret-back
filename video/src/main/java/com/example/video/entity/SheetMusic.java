@@ -3,6 +3,7 @@ package com.example.video.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -21,6 +22,7 @@ public class SheetMusic {
 
     private String path;
 
+    @CreationTimestamp
     private LocalDateTime uploadTime;
 
     public SheetMusic(Video video, String path) {
