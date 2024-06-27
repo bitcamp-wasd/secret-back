@@ -2,6 +2,8 @@ package com.example.user.service.implement;
 
 import com.example.user.entity.CustomOAuth2User;
 import com.example.user.entity.UserEntity;
+import com.example.user.entity.UserRankEntity;
+import com.example.user.repository.UserRankRepository;
 import com.example.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -18,6 +20,7 @@ import java.util.Map;
 public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
+    private final UserRankRepository userRankRepository;
     private final SecureRandom random = new SecureRandom();
 
     @Override
@@ -42,7 +45,9 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
         if (oauth2ClientName.equals("kakao")){
             email = oAuth2User.getAttributes().get("id") + "@kakao";
             nickname = generateRandomNickName("kakao_");
-            userEntity = new UserEntity(email, nickname, "kakao");
+            UserRankEntity defaultRank = userRankRepository.findByMinPoint(0)
+                    .orElseThrow(() -> new IllegalArgumentException("Default rank not found"));
+            userEntity = new UserEntity(email, nickname, "kakao", defaultRank);
         }
 
         if (oauth2ClientName.equals("naver")){
@@ -50,7 +55,9 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
             Map<String, String> responseMap = (Map<String, String>) oAuth2User.getAttributes().get("response");
             email = responseMap.get("email");
             nickname = generateRandomNickName("naver_");
-            userEntity = new UserEntity(email, nickname, "naver");
+            UserRankEntity defaultRank = userRankRepository.findByMinPoint(0)
+                    .orElseThrow(() -> new IllegalArgumentException("Default rank not found"));
+            userEntity = new UserEntity(email, nickname, "naver", defaultRank);
         }
 
         if(userRepository.existsByEmail(email)){

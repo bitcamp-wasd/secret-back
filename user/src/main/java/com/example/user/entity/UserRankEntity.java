@@ -26,6 +26,6 @@ public class UserRankEntity {
     private int maxPoint;
 
     private String imagePath;
-    // 랭크 이미지 경로
+    // 랭크 이미지 경로 이건 잠시 나중에 추가 방식 넣기
 
 }
