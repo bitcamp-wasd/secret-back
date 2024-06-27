@@ -5,9 +5,11 @@ import com.example.user.dto.request.auth.*;
 import com.example.user.dto.response.ResponseDto;
 import com.example.user.dto.response.auth.*;
 import com.example.user.entity.UserEntity;
+import com.example.user.entity.UserRankEntity;
 import com.example.user.filter.TokenUtils;
 import com.example.user.provider.EmailProvider;
 import com.example.user.provider.JwtProvider;
+import com.example.user.repository.UserRankRepository;
 import com.example.user.repository.UserRepository;
 import com.example.user.service.AuthService;
 import com.example.user.service.RedisService;
@@ -33,6 +35,7 @@ public class AuthServiceImpl implements AuthService {
     private final RedisService redisService;
     private final JwtProvider jwtProvider;
     private final EmailProvider emailProvider;
+    private final UserRankRepository userRankRepository;
 
     private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -133,7 +136,10 @@ public class AuthServiceImpl implements AuthService {
             if (isExistNickName)
                 return NickNameCheckResponseDto.duplicateNickName();
 
-            UserEntity userEntity = new UserEntity(dto);
+            UserRankEntity defaultRank = userRankRepository.findByMinPoint(0)
+                    .orElseThrow(() -> new IllegalArgumentException("Default rank not found"));
+
+            UserEntity userEntity = new UserEntity(dto, defaultRank);
             userRepository.save(userEntity);
 
             redisService.delete("certification:" + email);
