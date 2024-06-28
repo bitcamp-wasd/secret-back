@@ -1,6 +1,7 @@
 package com.example.user.controller;
 
 import com.example.user.dto.UpdateUserInfoDto;
+import com.example.user.dto.UserInfoBannerDto;
 import com.example.user.dto.UserInfoDto;
 import com.example.user.entity.CustomOAuth2User;
 import com.example.user.service.UserService;
@@ -25,8 +26,16 @@ public class UserController {
         return ResponseEntity.ok("This is a secured test");
     }
 
+    // 유저 베너
+    @GetMapping("/myBanner")
+    public ResponseEntity<UserInfoBannerDto> getMyBanner(Authentication authentication){
+        String email = authentication.getName();
+        UserInfoBannerDto userInfoBannerDto = userService.getUserInfoBanner(email);
+        return ResponseEntity.ok(userInfoBannerDto);
+    }
+
     // 유저 마이페이지
-    @GetMapping("myInfo")
+    @GetMapping("/myInfo")
     public ResponseEntity<UserInfoDto> getMyInfo(Authentication authentication){
         String email = authentication.getName();
         UserInfoDto userInfo = userService.getUserInfo(email);
@@ -35,8 +44,9 @@ public class UserController {
 
     // 유저 정보 수정
     @PutMapping("/editInfo")
-    public ResponseEntity<?> updateEditInfo(@RequestBody @Valid UpdateUserInfoDto updateUserInfoDto){
-        userService.updateUser(updateUserInfoDto);
+    public ResponseEntity<?> updateEditInfo(Authentication authentication, @RequestBody @Valid UpdateUserInfoDto updateUserInfoDto){
+        String email = authentication.getName();
+        userService.updateUser(email, updateUserInfoDto);
         return ResponseEntity.ok().build();
     }
 
