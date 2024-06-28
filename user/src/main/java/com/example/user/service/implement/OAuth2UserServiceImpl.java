@@ -45,9 +45,7 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
         if (oauth2ClientName.equals("kakao")){
             email = oAuth2User.getAttributes().get("id") + "@kakao";
             nickname = generateRandomNickName("kakao_");
-            UserRankEntity defaultRank = userRankRepository.findByMinPoint(0)
-                    .orElseThrow(() -> new IllegalArgumentException("Default rank not found"));
-            userEntity = new UserEntity(email, nickname, "kakao", defaultRank);
+
         }
 
         if (oauth2ClientName.equals("naver")){
@@ -55,19 +53,22 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
             Map<String, String> responseMap = (Map<String, String>) oAuth2User.getAttributes().get("response");
             email = responseMap.get("email");
             nickname = generateRandomNickName("naver_");
+        }
+
+
+        // 이미 등록된 사용자인지 확인
+        userEntity = userRepository.findByEmail(email);
+        if (userEntity != null) {
+            // 이미 등록된 사용자이므로 로그인 처리
+            return new CustomOAuth2User(email);
+        } else {
+            // 새로운 사용자 등록
             UserRankEntity defaultRank = userRankRepository.findByMinPoint(0)
                     .orElseThrow(() -> new IllegalArgumentException("Default rank not found"));
-            userEntity = new UserEntity(email, nickname, "naver", defaultRank);
+            userEntity = new UserEntity(email, nickname, oauth2ClientName, defaultRank);
+            userRepository.save(userEntity);
+            return new CustomOAuth2User(email);
         }
-
-        if(userRepository.existsByEmail(email)){
-            throw new OAuth2AuthenticationException("이미 존재하는 이메일 입니다.");
-        }
-
-        userRepository.save(userEntity);
-
-        return new CustomOAuth2User(email);
-
     }
 
     private String generateRandomNickName(String prefix) {
