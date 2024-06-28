@@ -71,8 +71,8 @@ public class WebSecurityConfig {
     }
 
     @Bean
+    // CORS 설정 정의
     protected CorsConfigurationSource corsConfigurationSource() {
-
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.addAllowedOrigin("*");
         corsConfiguration.addAllowedMethod("*");

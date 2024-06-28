@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 
@@ -41,6 +43,14 @@ public class UserEntity {
     private String role;
     // 기본적으로 회윈가입 할 시 디폴트 값 ROLE_USER
 
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public UserEntity(SignUpRequestDto dto, UserRankEntity defaultRank){
         this.email = dto.getEmail();
         this.password = dto.getPassword();
@@ -52,8 +62,11 @@ public class UserEntity {
     }
 
     public UserEntity(String email, String nickname, String socialType, UserRankEntity defaultRank){
+
+        final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
         this.email = email;
-        this.password = "passw0rd";
+        this.password = passwordEncoder.encode("passw0rd");
         this.nickname = nickname;
         this.socialType = socialType;
         this.point = 0;
