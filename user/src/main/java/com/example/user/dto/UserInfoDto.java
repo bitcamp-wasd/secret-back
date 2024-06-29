@@ -13,6 +13,5 @@ public class UserInfoDto {
 
     private String email;
     private String nickName;
-    private String rankName;
     private int point;
 }
