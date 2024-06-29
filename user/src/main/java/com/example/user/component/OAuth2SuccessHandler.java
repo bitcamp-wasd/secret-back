@@ -29,16 +29,18 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             Authentication authentication) throws IOException, ServletException {
 
         CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
-        String email = oAuth2User.getName();
+
+        Long userId = userEntity.getUserId();
+        String role = userEntity.getRole();
 
         // Access Token 생성
-        String accessToken = jwtProvider.create(email, 3600);
+        String accessToken = jwtProvider.create(userId, role, 3600);
 
         // Refresh Token 생성 및 Redis에 저장
-        String refreshToken = jwtProvider.create(email, 604800); // 7일
+        String refreshToken = jwtProvider.create(userId, role, 604800); // 7일
 
-        redisService.set("access:" + email, accessToken, 3600);
-        redisService.set("refresh:" + email, refreshToken, 604800);
+        redisService.set("access:" + userId, accessToken, 3600);
+        redisService.set("refresh:" + userId, refreshToken, 604800);
 
         response.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
 

@@ -163,18 +163,19 @@ public class AuthServiceImpl implements AuthService {
                 return SignInResponseDto.signInFail();
             }
 
-            String email = userEntity.getEmail();
-            String accessToken = jwtProvider.create(email, 3600);
-            String refreshToken = jwtProvider.create(email, 604800);
+            Long userId = userEntity.getUserId();
+            String role = userEntity.getRole();
+            String accessToken = jwtProvider.create(userId, role, 3600);
+            String refreshToken = jwtProvider.create(userId, role, 604800);
 
             // 레디스에 엑세스 토큰 저장
-            redisService.set("access:" + email, accessToken, 3600);
+            redisService.set("access:" + userId, accessToken, 3600);
             // 레디스에 리프레시 토큰 저장
-            redisService.set("refresh:" + email, refreshToken, 604800);
+            redisService.set("refresh:" + userId, refreshToken, 604800);
 
             // 로그 추가
-            System.out.println("엑세스 토큰 저장: access:" + email + " -> " + accessToken);
-            System.out.println("리프레시 토큰 저장: refresh:" + email + " -> " + refreshToken);
+            System.out.println("엑세스 토큰 저장: access:" + userId + " -> " + accessToken);
+            System.out.println("리프레시 토큰 저장: refresh:" + userId + " -> " + refreshToken);
 
             return SignInResponseDto.success(accessToken, refreshToken);
         } catch (Exception e) {
@@ -188,11 +189,12 @@ public class AuthServiceImpl implements AuthService {
         String token = TokenUtils.parseBearerToken(request);
 
         if (token != null){
-            String email = jwtProvider.validate(token);
-            if (email != null) {
+            Claims claims = jwtProvider.validate(token);
+            if (claims != null) {
+                Long userId = Long.valueOf(claims.getSubject());
                 // Redis에서 Refresh Token 삭제
-                redisService.delete("access:" + email);
-                redisService.delete( "refresh:" + email);
+                redisService.delete("access:" + userId);
+                redisService.delete( "refresh:" + userId);
 
                 // Access Token 쿠키 삭제
                 Cookie cookie = new Cookie("access_token", null);

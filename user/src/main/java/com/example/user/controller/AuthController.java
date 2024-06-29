@@ -92,11 +92,13 @@ public class AuthController {
         String refreshToken = TokenUtils.parseBearerToken(request);
 
         if (refreshToken != null){
-            String email = jwtProvider.validate(refreshToken);
-            if (email != null){
-                String storedRefreshToken = redisService.get("refresh:" + email);
+            Claims claims = jwtProvider.validate(refreshToken);
+            if (claims != null){
+                Long userId = Long.valueOf(claims.getSubject());
+                String storedRefreshToken = redisService.get("refresh:" + userId);
                 if (refreshToken.equals(storedRefreshToken)){
-                    String newAccessToken = jwtProvider.create(email, 3600);
+                    String role = claims.get("role", String.class);
+                    String newAccessToken = jwtProvider.create(userId, role, 3600);
 
                     // 응답 헤더에 새로 발급된 액세스 토큰 포함
                     response.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + newAccessToken);

@@ -48,26 +48,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
 
-            String email = jwtProvider.validate(token);
-            logger.debug("Email: {}", email);
-
-            if (email == null) {
+            Claims claims = jwtProvider.validate(token);
+            if (claims == null) {
                 filterChain.doFilter(request, response);
                 return;
             }
 
-            String storedAccessToken = redisService.get("access:" + email);
-            System.out.println("레디스에서 가져옴: access:" + email + " -> " + storedAccessToken);
 
-            if (!token.equals(storedAccessToken)) {
+            Long userId = Long.valueOf(claims.getSubject());
+            String role = claims.get("role", String.class);
+            logger.debug("UserId: {}, Role: {}", userId, role);
+
+            String storedAccessToken = redisService.get("access:" + userId);
+            if (!token.equals(storedAccessToken)){
                 filterChain.doFilter(request, response);
                 return;
             }
 
-            UserEntity userEntity = userRepository.findByEmail(email);
-
-            String role = userEntity.getRole(); // role : ROLE_USER, ROLE_ADMIN
-            logger.debug("User Role: {}", role);
+            UserEntity userEntity = userRepository.findById(userId)
+                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
             // 권한 목록 생성
             List<GrantedAuthority> authorities = new ArrayList<>();
@@ -77,7 +76,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
 
             // 이메일 권한 사용해 인증 토큰 생성
-            AbstractAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, null, authorities);
+            AbstractAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userId, null, authorities);
             authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
             securityContext.setAuthentication(authenticationToken);
