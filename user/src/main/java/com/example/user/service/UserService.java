@@ -22,13 +22,10 @@ public class UserService {
     private final UserRankRepository userRankRepository;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public void addUserPoints(String email, int points){
+    public void addUserPoints(Long userId, int points){
 
-        UserEntity user = userRepository.findByEmail(email);
-
-        if(user == null){
-            throw new IllegalArgumentException("User not found");
-        }
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         //랭크 정보 데이터베이스에서 가져오기
         List<UserRankEntity> ranks = userRankRepository.findAll();
@@ -36,12 +33,10 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public UserInfoBannerDto getUserInfoBanner(String email){
+    public UserInfoBannerDto getUserInfoBanner(Long userId){
 
-        UserEntity userEntity = userRepository.findByEmail(email);
-        if(userEntity == null){
-            throw new IllegalArgumentException("User not found");
-        }
+        UserEntity userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         UserInfoBannerDto userInfoBannerDto = new UserInfoBannerDto(
                 userEntity.getNickname(),
@@ -51,12 +46,10 @@ public class UserService {
         return userInfoBannerDto;
     }
 
-    public UserInfoDto getUserInfo(String email){
+    public UserInfoDto getUserInfo(Long userId){
 
-        UserEntity userEntity = userRepository.findByEmail(email);
-        if(userEntity == null){
-            throw new IllegalArgumentException("User not found");
-        }
+        UserEntity userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         UserInfoDto userInfoDto = new UserInfoDto(
                 userEntity.getEmail(),
@@ -66,11 +59,11 @@ public class UserService {
         return userInfoDto;
     }
 
-    public void updateUser(String email, UpdateUserInfoDto dto){
-        UserEntity userEntity = userRepository.findByEmail(email);
-        if(userEntity == null){
-            throw new IllegalArgumentException("User not found");
-        }
+    public void updateUser((Long userId, UpdateUserInfoDto dto){
+
+        UserEntity userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
 
         if (!userEntity.getNickname().equals(dto.getNickName())){
             boolean isExistNickName = userRepository.existsByNickname(dto.getNickName());

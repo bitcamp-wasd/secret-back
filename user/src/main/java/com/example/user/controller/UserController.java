@@ -29,24 +29,24 @@ public class UserController {
     // 유저 베너
     @GetMapping("/myBanner")
     public ResponseEntity<UserInfoBannerDto> getMyBanner(Authentication authentication){
-        String email = authentication.getName();
-        UserInfoBannerDto userInfoBannerDto = userService.getUserInfoBanner(email);
+        Long userId = (Long) authentication.getPrincipal();
+        UserInfoBannerDto userInfoBannerDto = userService.getUserInfoBanner(userId);
         return ResponseEntity.ok(userInfoBannerDto);
     }
 
     // 유저 마이페이지
     @GetMapping("/myInfo")
     public ResponseEntity<UserInfoDto> getMyInfo(Authentication authentication){
-        String email = authentication.getName();
-        UserInfoDto userInfo = userService.getUserInfo(email);
+        Long userId = (Long) authentication.getPrincipal();
+        UserInfoDto userInfo = userService.getUserInfo(userId);
         return ResponseEntity.ok(userInfo);
     }
 
     // 유저 정보 수정
     @PutMapping("/editInfo")
     public ResponseEntity<?> updateEditInfo(Authentication authentication, @RequestBody @Valid UpdateUserInfoDto updateUserInfoDto){
-        String email = authentication.getName();
-        userService.updateUser(email, updateUserInfoDto);
+        Long userId = (Long) authentication.getPrincipal();
+        userService.updateUser(userId, updateUserInfoDto);
         return ResponseEntity.ok().build();
     }
 

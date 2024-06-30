@@ -19,27 +19,27 @@ public class JwtProvider {
     @Value("${jwt.secret}")
     private String secretKey;
 
-    public String create(String email, long expirationTime) {
+    public String create(Long userId, String role, long expirationTime) {
         Date expiredDate = Date.from(Instant.now().plus(expirationTime, ChronoUnit.SECONDS));
         Key key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
 
         return Jwts.builder()
                 .signWith(key, SignatureAlgorithm.HS256)
-                .setSubject(email)
+                .setSubject(String.valueOf(userId))
+                .claim("role", role)
                 .setIssuedAt(new Date())
                 .setExpiration(expiredDate)
                 .compact();
     }
 
-    public String validate(String jwt) {
+    public Claims validate(String jwt) {
         Key key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
         try {
             return Jwts.parserBuilder()
                     .setSigningKey(key)
                     .build()
                     .parseClaimsJws(jwt)
-                    .getBody()
-                    .getSubject();
+                    .getBody();
         } catch (Exception e) {
             return null;
         }
