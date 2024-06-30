@@ -13,6 +13,7 @@ import com.example.user.repository.UserRankRepository;
 import com.example.user.repository.UserRepository;
 import com.example.user.service.AuthService;
 import com.example.user.service.RedisService;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

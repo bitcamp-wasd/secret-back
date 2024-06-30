@@ -4,6 +4,7 @@ import com.example.user.entity.UserEntity;
 import com.example.user.provider.JwtProvider;
 import com.example.user.repository.UserRepository;
 import com.example.user.service.RedisService;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
