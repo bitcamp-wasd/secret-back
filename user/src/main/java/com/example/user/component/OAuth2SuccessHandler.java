@@ -39,8 +39,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         // Refresh Token 생성 및 Redis에 저장
         String refreshToken = jwtProvider.create(userId, role, 604800); // 7일
 
-        redisService.set("access:" + userId, accessToken, 3600);
-        redisService.set("refresh:" + userId, refreshToken, 604800);
+        redisService.setTokenData(accessToken, userId, role, 3600);
+        redisService.setTokenData(refreshToken, userId, role, 604800);
 
         response.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
 

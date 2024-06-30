@@ -6,6 +6,7 @@ import com.example.user.filter.TokenUtils;
 import com.example.user.provider.JwtProvider;
 import com.example.user.service.AuthService;
 import com.example.user.service.RedisService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -88,17 +89,20 @@ public class AuthController {
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<?> refreshToken(HttpServletRequest request, HttpServletResponse response) {
-        String refreshToken = TokenUtils.parseBearerToken(request);
+    public ResponseEntity<?> refreshToken(HttpServletRequest request, HttpServletResponse response) throws JsonProcessingException {
+        String refreshToken = TokenUtils.parseRefreshToken(request);
 
         if (refreshToken != null){
             Claims claims = jwtProvider.validate(refreshToken);
             if (claims != null){
-                Long userId = Long.valueOf(claims.getSubject());
-                String storedRefreshToken = redisService.get("refresh:" + userId);
-                if (refreshToken.equals(storedRefreshToken)){
-                    String role = claims.get("role", String.class);
+                RedisService.TokenData tokenData = redisService.getTokenData(refreshToken);
+                if (tokenData != null) {
+                    Long userId = tokenData.userId;
+                    String role = tokenData.role;
                     String newAccessToken = jwtProvider.create(userId, role, 3600);
+
+                    // Redis에 새 엑세스 토큰 저장
+                    redisService.setTokenData(newAccessToken, userId, role, 3600);
 
                     // 응답 헤더에 새로 발급된 액세스 토큰 포함
                     response.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + newAccessToken);

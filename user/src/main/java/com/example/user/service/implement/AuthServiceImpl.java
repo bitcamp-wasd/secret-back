@@ -170,13 +170,13 @@ public class AuthServiceImpl implements AuthService {
             String refreshToken = jwtProvider.create(userId, role, 604800);
 
             // 레디스에 엑세스 토큰 저장
-            redisService.set("access:" + userId, accessToken, 3600);
+            redisService.setTokenData(accessToken, userId, role, 3600);
             // 레디스에 리프레시 토큰 저장
-            redisService.set("refresh:" + userId, refreshToken, 604800);
+            redisService.setTokenData(refreshToken, userId, role, 604800);
 
             // 로그 추가
-            System.out.println("엑세스 토큰 저장: access:" + userId + " -> " + accessToken);
-            System.out.println("리프레시 토큰 저장: refresh:" + userId + " -> " + refreshToken);
+            System.out.println("엑세스 토큰 저장: access:" + accessToken + " -> " + userId + role);
+            System.out.println("리프레시 토큰 저장: refresh:" + refreshToken + " -> " + userId + role);
 
             return SignInResponseDto.success(accessToken, refreshToken);
         } catch (Exception e) {
@@ -187,21 +187,23 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response){
-        String token = TokenUtils.parseBearerToken(request);
+        String accessToken = TokenUtils.parseBearerToken(request);
 
-        if (token != null){
-            Claims claims = jwtProvider.validate(token);
+        if (accessToken != null){
+            Claims claims = jwtProvider.validate(accessToken);
             if (claims != null) {
-                Long userId = Long.valueOf(claims.getSubject());
-                // Redis에서 Refresh Token 삭제
-                redisService.delete("access:" + userId);
-                redisService.delete( "refresh:" + userId);
+                // Redis에서 Access Token 및 Refresh Token 삭제
+                redisService.delete(accessToken);
+                String refreshToken = TokenUtils.parseRefreshToken(request);
+                if (refreshToken != null) {
+                    redisService.delete(refreshToken);
+                }
 
-                // Access Token 쿠키 삭제
-                Cookie cookie = new Cookie("access_token", null);
-                cookie.setMaxAge(0);
-                cookie.setPath("/");
-                response.addCookie(cookie);
+                // Refresh Token 쿠키 삭제
+                Cookie refreshTokenCookie = new Cookie("refresh_token", null);
+                refreshTokenCookie.setMaxAge(0);
+                refreshTokenCookie.setPath("/");
+                response.addCookie(refreshTokenCookie);
 
                 // 응답 헤더에서 액세스 토큰 제거
                 response.setHeader(HttpHeaders.AUTHORIZATION, "");
