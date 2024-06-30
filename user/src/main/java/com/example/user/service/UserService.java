@@ -59,7 +59,7 @@ public class UserService {
         return userInfoDto;
     }
 
-    public void updateUser((Long userId, UpdateUserInfoDto dto){
+    public void updateUser(Long userId, UpdateUserInfoDto dto){
 
         UserEntity userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));

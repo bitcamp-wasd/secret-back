@@ -6,6 +6,7 @@ import com.example.user.filter.TokenUtils;
 import com.example.user.provider.JwtProvider;
 import com.example.user.service.AuthService;
 import com.example.user.service.RedisService;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
