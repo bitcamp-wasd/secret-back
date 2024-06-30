@@ -43,15 +43,15 @@ public class WebSecurityConfig {
                 .csrf(CsrfConfigurer::disable)
                 .httpBasic(HttpBasicConfigurer::disable)
                 .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
-                .authorizeHttpRequests(request -> request
-                        // 특정 경로에 대해 모든 사용자에게 접근 허용
-                        .requestMatchers("/", "api/auth/**", "/oauth2/**").permitAll()
-                        // user 권한 가진 사용자만 접근 허용
-                        .requestMatchers("api/user/**").hasRole("USER")
-                        // admin 권한 가진 사용자만 접근 허용
-                        .requestMatchers("api/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated())
+                .authorizeHttpRequests(request -> request.requestMatchers("**").permitAll()
+//                        // 특정 경로에 대해 모든 사용자에게 접근 허용
+//                        .requestMatchers("/", "api/auth/**", "/oauth2/**", "/h2**").permitAll()
+//                        // user 권한 가진 사용자만 접근 허용
+//                        .requestMatchers("api/user/**").hasRole("USER")
+//                        // admin 권한 가진 사용자만 접근 허용
+//                        .requestMatchers("api/admin/**").hasRole("ADMIN")
+//                        .anyRequest().authenticated()
+                )
 
                 .oauth2Login(oauth2 -> oauth2
                         // OAuth2 로그인 설정, 인증 엔드포인트 기본 url 설정
@@ -64,7 +64,9 @@ public class WebSecurityConfig {
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint(authEntryPoint) // 401 처리
                         .accessDeniedHandler(customAccessDeniedHandler)) // 403 처리
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                // -------------- delete
+                .headers((http) -> http.frameOptions().disable());
 
         return httpSecurity.build();
 

@@ -1,4 +1,4 @@
-package com.example.user.service;
+package com.example.gateway.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -11,7 +11,6 @@ import java.util.concurrent.TimeUnit;
 @Log4j2
 @RequiredArgsConstructor
 public class RedisService {
-
     private final RedisTemplate<String, Object> redisTemplate;
 
 
@@ -31,5 +30,9 @@ public class RedisService {
     public void delete(String key) {
         redisTemplate.delete(key);
         log.info("레디스에서 삭제: " + key);
+    }
+
+    public boolean hasKey(String key) {
+        return redisTemplate.hasKey(key);
     }
 }
