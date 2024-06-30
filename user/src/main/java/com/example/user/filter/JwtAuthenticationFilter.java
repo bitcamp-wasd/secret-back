@@ -56,15 +56,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
 
 
-            Long userId = Long.valueOf(claims.getSubject());
-            String role = claims.get("role", String.class);
-            logger.debug("UserId: {}, Role: {}", userId, role);
-
-            String storedAccessToken = redisService.get("access:" + userId);
-            if (!token.equals(storedAccessToken)){
+            RedisService.TokenData tokenData = redisService.getTokenData(token);
+            if (tokenData == null) {
                 filterChain.doFilter(request, response);
                 return;
             }
+
+            Long userId = tokenData.userId;
+            String role = tokenData.role;
+            logger.debug("UserId: {}, Role: {}", userId, role);
 
             UserEntity userEntity = userRepository.findById(userId)
                     .orElseThrow(() -> new IllegalArgumentException("User not found"));
