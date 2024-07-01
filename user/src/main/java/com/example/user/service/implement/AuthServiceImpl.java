@@ -18,6 +18,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Log4j2
 public class AuthServiceImpl implements AuthService {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthServiceImpl.class);
@@ -175,8 +177,8 @@ public class AuthServiceImpl implements AuthService {
             redisService.setTokenData(refreshToken, userId, role, 604800);
 
             // 로그 추가
-            System.out.println("엑세스 토큰 저장: access:" + accessToken + " -> " + userId + role);
-            System.out.println("리프레시 토큰 저장: refresh:" + refreshToken + " -> " + userId + role);
+            log.info("엑세스 토큰 저장: access:" + accessToken + " -> " + userId + role);
+            log.info("리프레시 토큰 저장: refresh:" + refreshToken + " -> " + userId + role);
 
             return SignInResponseDto.success(accessToken, refreshToken);
         } catch (Exception e) {

@@ -7,8 +7,10 @@ import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
 
 
@@ -16,6 +18,20 @@ import java.nio.charset.StandardCharsets;
 
 @Component
 public class JwtUtil {
+
+
+    // http 헤더로부터 bearer 토큰을 가져옴
+    public static String parseBearerToken(ServerHttpRequest request) {
+        String authorization = request.getHeaders().getFirst("Authorization");
+
+        boolean hasAuthorization = StringUtils.hasText(authorization);
+        if (!hasAuthorization) return null;
+
+        boolean isBearer = authorization.startsWith("Bearer ");
+        if (!isBearer) return null;
+
+        return authorization.substring(7);
+    }
 
     public DataBuffer errorMessage(ServerHttpResponse response, String message) {
         String errorJson = String.format("{\"errorMessage\": \"%s\"}", message);

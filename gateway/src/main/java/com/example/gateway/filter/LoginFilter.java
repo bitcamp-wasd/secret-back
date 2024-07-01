@@ -40,7 +40,7 @@ public class LoginFilter extends AbstractGatewayFilterFactory<LoginFilter.Config
             if(!request.getPath().toString().contains("auth"))
                 return chain.filter(exchange);
 
-            String authorization = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+            String authorization = jwtUtil.parseBearerToken(request);
 
             // 로그인이 안됬을 경우
             if(authorization == null)
@@ -48,11 +48,16 @@ public class LoginFilter extends AbstractGatewayFilterFactory<LoginFilter.Config
 
             // access키가 존재하지 않을 경우 -> refresh token으로 재발급
             if(redisService.hasKey(authorization) == false)
-                return Mono.empty();
+                return Mono.defer(() -> {
+                    return Mono.empty();
+                });
 
+            ServerHttpRequest builder = request.mutate().header("user", redisService.get(authorization)).build();
 
+            log.info(request.getHeaders().toSingleValueMap());
 
-            return chain.filter(exchange);
+            // 통과
+            return chain.filter(exchange.mutate().request(builder).build());
         };
     }
 
