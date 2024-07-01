@@ -60,14 +60,14 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
         userEntity = userRepository.findByEmail(email);
         if (userEntity != null) {
             // 이미 등록된 사용자이므로 로그인 처리
-            return new CustomOAuth2User(email,userEntity.getUserId(), userEntity.getRole());
+            return new CustomOAuth2User(email,userEntity.getUserId(), userEntity.getRole(), nickname);
         } else {
             // 새로운 사용자 등록
             UserRankEntity defaultRank = userRankRepository.findByMinPoint(0)
                     .orElseThrow(() -> new IllegalArgumentException("Default rank not found"));
             userEntity = new UserEntity(email, nickname, oauth2ClientName, defaultRank);
             userRepository.save(userEntity);
-            return new CustomOAuth2User(email, userEntity.getUserId(), userEntity.getRole());
+            return new CustomOAuth2User(email, userEntity.getUserId(), userEntity.getRole(), nickname);
         }
     }
 

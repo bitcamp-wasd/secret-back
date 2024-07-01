@@ -20,7 +20,7 @@ public class JwtProvider {
     @Value("${jwt.secret}")
     private String secretKey;
 
-    public String create(Long userId, String role, long expirationTime) {
+    public String create(Long userId, String role, String nickName, long expirationTime) {
         Date expiredDate = Date.from(Instant.now().plus(expirationTime, ChronoUnit.SECONDS));
         Key key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
 
@@ -28,6 +28,7 @@ public class JwtProvider {
                 .signWith(key, SignatureAlgorithm.HS256)
                 .setSubject(String.valueOf(userId))
                 .claim("role", role)
+                .claim("nickName", nickName)
                 .setIssuedAt(new Date())
                 .setExpiration(expiredDate)
                 .compact();
