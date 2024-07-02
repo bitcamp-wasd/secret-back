@@ -1,5 +1,6 @@
 package com.example.video.entity;
 
+import com.example.video.dto.post.PostResponseDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,6 +35,8 @@ public class Post {
     @JoinColumn(name="video_id")
     private Video video;
 
+    private Long userId;
+
     @Column(name="user_nickname")
     private String userNickname;
 
@@ -48,13 +51,26 @@ public class Post {
     private List<PostComment> postComment;
 
 
-    public Post(String title,Category category, String thumbnailPath, Video video, String userNickname) {
+    public Post(String title,Category category, String thumbnailPath, Video video, Long userId, String userNickname) {
         this.title = title;
         this.category = category;
         this.thumbnailPath = thumbnailPath;
         this.video = video;
+        this.userId = userId;
         this.userNickname = userNickname;
         this.uploadDate = LocalDate.now();
+    }
+
+    public PostResponseDto toPostResponseDto() {
+        return new PostResponseDto(
+                video.getId(),
+                thumbnailPath,
+                title,
+                views,
+                uploadDate,
+                video.getLength(),
+                userNickname
+        );
     }
 
 

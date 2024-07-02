@@ -5,8 +5,10 @@ spring:
     import: optional:configserver:http://localhost:8082
   profiles:
     active: ${setting.profile.type}
+  devtools:
+    restart:
+      enabled: true
 
 server:
   port: 8083
-
 

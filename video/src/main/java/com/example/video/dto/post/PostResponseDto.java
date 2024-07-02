@@ -2,20 +2,20 @@ package com.example.video.dto.post;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.net.URL;
-import java.util.List;
+import java.time.LocalDate;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 public class PostResponseDto {
 
-    private URL videoPresignedUrl;
-    private URL thumbnailPresignedUrl;
-    private List<URL> sheetMusicPresignedUrl;
-
+    private Long video_id;
+    private String thumbnail;
+    private String title;
+    private Long views;
+    private LocalDate uploadDate;
+    private int length;
+    private String nickName;
 }

@@ -20,4 +20,6 @@ public class PostComment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="post_id")
     private Post post;
+
+    private String comment;
 }

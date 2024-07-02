@@ -1,27 +1,41 @@
 package com.example.user.controller;
 
+import com.example.user.common.ParseUtil;
 import com.example.user.dto.UpdateUserInfoDto;
+import com.example.user.dto.UserAuth;
 import com.example.user.dto.UserInfoBannerDto;
 import com.example.user.dto.UserInfoDto;
-import com.example.user.entity.CustomOAuth2User;
 import com.example.user.service.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.util.http.parser.Authorization;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
+@Log4j2
 public class UserController {
 
     private final UserService userService;
+    private final ParseUtil parseUtil;
 
     // 확인용
     @GetMapping("/secured")
     public ResponseEntity<String> securedTest(){
+        return ResponseEntity.ok("This is a secured test");
+    }
+
+    @GetMapping(value = "/auth/secured", headers = "user")
+    public ResponseEntity<String> AuthTest(@RequestHeader String user) throws JsonProcessingException {
+        log.info(user);
+        UserAuth userAuth = parseUtil.parseAuth(user);
+        log.info(userAuth);
+
         return ResponseEntity.ok("This is a secured test");
     }
 
