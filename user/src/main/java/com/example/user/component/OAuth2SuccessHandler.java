@@ -32,15 +32,16 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         Long userId = oAuth2User.getUserId();
         String role = oAuth2User.getRole();
+        String nickName = oAuth2User.getNickName();
 
         // Access Token 생성
-        String accessToken = jwtProvider.create(userId, role, 3600);
+        String accessToken = jwtProvider.create(userId, role, nickName, 3600);
 
         // Refresh Token 생성 및 Redis에 저장
-        String refreshToken = jwtProvider.create(userId, role, 604800); // 7일
+        String refreshToken = jwtProvider.create(userId, role, nickName, 604800); // 7일
 
-        redisService.setTokenData(accessToken, userId, role, 3600);
-        redisService.setTokenData(refreshToken, userId, role, 604800);
+        redisService.setTokenData(accessToken, userId, role, nickName, 3600);
+        redisService.setTokenData(refreshToken, userId, role, nickName, 604800);
 
         response.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
 
@@ -52,7 +53,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         refreshTokenCookie.setMaxAge(604800); // 7일
         response.addCookie(refreshTokenCookie);
 
-        response.sendRedirect("http://localhost:3000/auth/oauth-response/" + accessToken + "/3600");
+        response.sendRedirect("http://localhost:3000");
     }
 
 }

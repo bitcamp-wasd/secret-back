@@ -168,17 +168,18 @@ public class AuthServiceImpl implements AuthService {
 
             Long userId = userEntity.getUserId();
             String role = userEntity.getRole();
-            String accessToken = jwtProvider.create(userId, role, 3600);
-            String refreshToken = jwtProvider.create(userId, role, 604800);
+            String nickName = userEntity.getNickname();
+            String accessToken = jwtProvider.create(userId, role, nickName, 3600);
+            String refreshToken = jwtProvider.create(userId, role, nickName,604800);
 
             // 레디스에 엑세스 토큰 저장
-            redisService.setTokenData(accessToken, userId, role, 3600);
+            redisService.setTokenData(accessToken, userId, role, nickName,3600);
             // 레디스에 리프레시 토큰 저장
-            redisService.setTokenData(refreshToken, userId, role, 604800);
+            redisService.setTokenData(refreshToken, userId, role, nickName, 604800);
 
             // 로그 추가
-            log.info("엑세스 토큰 저장: access:" + accessToken + " -> " + userId + role);
-            log.info("리프레시 토큰 저장: refresh:" + refreshToken + " -> " + userId + role);
+            log.info("엑세스 토큰 저장: access:" + accessToken + " -> " + userId + role + nickName);
+            log.info("리프레시 토큰 저장: refresh:" + refreshToken + " -> " + userId + role + nickName);
 
             return SignInResponseDto.success(accessToken, refreshToken);
         } catch (Exception e) {

@@ -64,7 +64,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             Long userId = tokenData.userId;
             String role = tokenData.role;
-            logger.debug("UserId: {}, Role: {}", userId, role);
+            String nickName = tokenData.nickName;
+            logger.debug("UserId: {}, Role: {}, NickName: {}", userId, role, nickName);
 
             UserEntity userEntity = userRepository.findById(userId)
                     .orElseThrow(() -> new IllegalArgumentException("User not found"));

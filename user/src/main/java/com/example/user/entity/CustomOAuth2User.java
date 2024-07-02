@@ -16,12 +16,14 @@ public class CustomOAuth2User implements OAuth2User {
     private String email;
     private Long userId;
     private String role;
+    private String nickName;
 
 
-    public CustomOAuth2User(String email, Long userId, String role) {
+    public CustomOAuth2User(String email, Long userId, String role, String nickName) {
         this.email = email;
         this.userId = userId;
         this.role = role;
+        this.nickName = nickName;
     }
 
     @Override
@@ -46,4 +48,6 @@ public class CustomOAuth2User implements OAuth2User {
     public String getRole() {
         return role;
     }
+
+    public String getNickName() {return nickName; }
 }

@@ -36,8 +36,8 @@ public class RedisService {
         log.info("레디스에서 삭제: " + key);
     }
 
-    public void setTokenData(String token, Long userId, String role, long expirationTime) {
-        String value = "{\"userId\":" + userId + ",\"role\":\"" + role + "\"}";
+    public void setTokenData(String token, Long userId, String role, String nickName, long expirationTime) {
+        String value = "{\"userId\":" + userId + ",\"role\":\"" + role + ",\"nickName\":\"" + nickName +"\"}";
         set(token, value, expirationTime);
     }
 
@@ -52,5 +52,6 @@ public class RedisService {
     public static class TokenData {
         public Long userId;
         public String role;
+        public String nickName;
     }
 }

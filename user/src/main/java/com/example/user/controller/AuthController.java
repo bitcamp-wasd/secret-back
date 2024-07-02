@@ -99,10 +99,11 @@ public class AuthController {
                 if (tokenData != null) {
                     Long userId = tokenData.userId;
                     String role = tokenData.role;
-                    String newAccessToken = jwtProvider.create(userId, role, 3600);
+                    String nickName = tokenData.nickName;
+                    String newAccessToken = jwtProvider.create(userId, role, nickName,3600);
 
                     // Redis에 새 엑세스 토큰 저장
-                    redisService.setTokenData(newAccessToken, userId, role, 3600);
+                    redisService.setTokenData(newAccessToken, userId, role, nickName,3600);
 
                     // 응답 헤더에 새로 발급된 액세스 토큰 포함
                     response.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + newAccessToken);
