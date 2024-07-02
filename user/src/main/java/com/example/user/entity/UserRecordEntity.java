@@ -22,6 +22,6 @@ public class UserRecordEntity {
 
     private String challenge;
 
-    private String userRank;
+    private int userRank;
 
 }

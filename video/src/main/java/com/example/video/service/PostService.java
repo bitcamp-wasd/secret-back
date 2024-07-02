@@ -5,8 +5,9 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.Headers;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
+import com.example.video.dto.auth.UserAuth;
 import com.example.video.dto.post.PostRegisterDto;
-import com.example.video.dto.post.PostResponseDto;
+import com.example.video.dto.post.PostRegisterResponseDto;
 import com.example.video.entity.Category;
 import com.example.video.entity.Post;
 import com.example.video.entity.SheetMusic;
@@ -56,7 +57,7 @@ public class PostService {
      * @return 각 동영상, 이미지의 Presigned URL 반환
      */
     @PrePersist
-    public PostResponseDto posting(PostRegisterDto postRegisterDto) {
+    public PostRegisterResponseDto posting(UserAuth user, PostRegisterDto postRegisterDto) {
 
         // 파일 별 uuid 생성
         String videoUuid = postRegisterDto.getVideoName() != null ? Util.generateUuid("mp4"): null;
@@ -64,7 +65,7 @@ public class PostService {
         List<String> sheetMusicUuid = postRegisterDto.getSheetMusicName().stream()
                 .map((t) -> Util.generateUuid()).collect(Collectors.toList());
 
-        // presigned url 발급
+        // 동영상, 썸네일, 악보 presigned url 발급
         URL videoUrl = generateVideoPresignedUrl(videoUuid);
         URL thumbnailUrl = generateImagePresignedUrl(thumbnailUuid, thumbnailBucket);
         List<URL> sheetMusicUrl = sheetMusicUuid.stream()
@@ -88,7 +89,8 @@ public class PostService {
                 category,
                 thumbnailUuid,
                 video,
-                videoUuid);
+                user.getUserId(),
+                user.getNickName());
 
 
         videoRepository.save(video);
@@ -96,7 +98,7 @@ public class PostService {
         postRepository.save(post);
 
 
-        return new PostResponseDto(videoUrl,thumbnailUrl, sheetMusicUrl);
+        return new PostRegisterResponseDto(videoUrl,thumbnailUrl, sheetMusicUrl);
     }
 
 
