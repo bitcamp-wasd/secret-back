@@ -59,7 +59,7 @@ public class AuthController {
         return response;
     }
 
-    @PostMapping("logout")
+    @PostMapping("/sign-out")
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
         authService.logout(request,response);
 
