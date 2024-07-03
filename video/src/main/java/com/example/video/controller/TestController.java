@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.nio.charset.StandardCharsets;
+
 @RestController
 @RequiredArgsConstructor
 @Log4j2
@@ -26,7 +28,6 @@ public class TestController {
     @GetMapping(value = "/auth/secured")
     public ResponseEntity<String> AuthTest(@HeaderUserAuth UserAuth user) throws JsonProcessingException {
         log.info(user);
-
         return ResponseEntity.ok("This is a secured test");
     }
 }

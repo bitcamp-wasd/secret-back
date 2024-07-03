@@ -38,8 +38,11 @@ public class Video {
     private VideoState state;
 
 
-    @OneToMany(mappedBy = "video")
+    @OneToMany(mappedBy = "video", cascade = CascadeType.ALL)
     List<SheetMusic> sheetMusicList;
+
+    @OneToOne(mappedBy = "video", fetch = FetchType.LAZY)
+    Post post;
 
     public Video(String videoPath, String description, int length) {
         this.videoPath = videoPath;

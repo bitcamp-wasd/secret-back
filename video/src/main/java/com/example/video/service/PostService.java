@@ -8,6 +8,7 @@ import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.example.video.dto.auth.UserAuth;
 import com.example.video.dto.post.PostRegisterDto;
 import com.example.video.dto.post.PostRegisterResponseDto;
+import com.example.video.dto.post.PostResponseDto;
 import com.example.video.entity.Category;
 import com.example.video.entity.Post;
 import com.example.video.entity.SheetMusic;
@@ -19,18 +20,23 @@ import com.example.video.repository.SheetMusicRepository;
 import com.example.video.repository.VideoRepository;
 import jakarta.persistence.PrePersist;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 
 
 import java.net.URL;
+import java.nio.file.AccessDeniedException;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Log4j2
 public class PostService {
 
     private final CategoryRepository categoryRepository;
@@ -60,10 +66,10 @@ public class PostService {
     public PostRegisterResponseDto posting(UserAuth user, PostRegisterDto postRegisterDto) {
 
         // 파일 별 uuid 생성
-        String videoUuid = postRegisterDto.getVideoName() != null ? Util.generateUuid("mp4"): null;
+        String videoUuid = postRegisterDto.getVideoName() != null ? Util.generateUuid(): null;
         String thumbnailUuid = Util.generateUuid(Util.getExtension(postRegisterDto.getThumbnailName()));
         List<String> sheetMusicUuid = postRegisterDto.getSheetMusicName().stream()
-                .map((t) -> Util.generateUuid()).collect(Collectors.toList());
+                .map((t) -> Util.generateUuid(Util.getExtension(t))).collect(Collectors.toList());
 
         // 동영상, 썸네일, 악보 presigned url 발급
         URL videoUrl = generateVideoPresignedUrl(videoUuid);
@@ -84,6 +90,11 @@ public class PostService {
         // Post 생성
         Category category = categoryRepository.findByCategory(postRegisterDto.getCategory())
                 .orElseThrow(() -> new NullPointerException("category not found"));
+
+        log.info(user);
+
+
+
         Post post = new Post(
                 postRegisterDto.getTitle(),
                 category,
@@ -93,9 +104,8 @@ public class PostService {
                 user.getNickName());
 
 
-        videoRepository.save(video);
-        sheetMusicRepository.saveAll(sheetMusics);
         postRepository.save(post);
+        sheetMusicRepository.saveAll(sheetMusics);
 
 
         return new PostRegisterResponseDto(videoUrl,thumbnailUrl, sheetMusicUrl);
@@ -155,5 +165,30 @@ public class PostService {
         return amazonS3.generatePresignedUrl(generatePresignedUrlRequest);
     }
 
-    
+
+    /**
+     * 무한 스크롤을 위한 게시물 리스트 받기
+     * @param pageable
+     * @return
+     */
+    public Slice<Post> getPostList(Pageable pageable) {
+
+        return postRepository.findAll(pageable);
+    }
+
+    /**
+     * 게시물 삭제
+     * @param user
+     * @param id
+     */
+    public void deletePost(UserAuth user, Long id) {
+        Post post = postRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("잘못된 게시물입니다."));
+
+        // 작성자 본인 확인
+        if(post.getUserId() != user.getUserId())
+            throw new IllegalArgumentException("해당 게시물을 삭제할 권한이 없습니다.");
+
+        postRepository.delete(post);
+    }
+
 }

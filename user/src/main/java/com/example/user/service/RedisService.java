@@ -37,12 +37,13 @@ public class RedisService {
     }
 
     public void setTokenData(String token, Long userId, String role, String nickName, long expirationTime) {
-        String value = "{\"userId\":" + userId + ",\"role\":\"" + role + ",\"nickName\":\"" + nickName +"\"}";
+        String value = "{\"userId\":" + userId + ",\"role\":\"" + role + "\",\"nickName\":\"" + nickName +"\"}";
         set(token, value, expirationTime);
     }
 
     public TokenData getTokenData(String token) throws JsonProcessingException {
         String value = get(token);
+        log.info(value);
         if (value != null) {
             return new ObjectMapper().readValue(value, TokenData.class);
         }

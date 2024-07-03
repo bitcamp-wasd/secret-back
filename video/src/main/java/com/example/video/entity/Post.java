@@ -24,14 +24,14 @@ public class Post {
     private String title;
 
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="category_id")
     private Category category;
 
     @Column(name="thumbnail_path")
     private String thumbnailPath;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name="video_id")
     private Video video;
 
@@ -47,8 +47,9 @@ public class Post {
     private Long views;
 
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany
     private List<PostComment> postComment;
+
 
 
     public Post(String title,Category category, String thumbnailPath, Video video, Long userId, String userNickname) {

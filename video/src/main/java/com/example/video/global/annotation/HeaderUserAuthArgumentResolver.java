@@ -10,11 +10,14 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+import java.util.Base64;
+
 @Component
 @RequiredArgsConstructor
 public class HeaderUserAuthArgumentResolver implements HandlerMethodArgumentResolver {
 
     private final ObjectMapper objectMapper;
+    private final Base64.Decoder decoder;
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -30,7 +33,8 @@ public class HeaderUserAuthArgumentResolver implements HandlerMethodArgumentReso
 
 
             if(value != null) {
-                return objectMapper.readValue(value, parameter.getParameterType());
+                String decodeValue = new String(decoder.decode(value));
+                return objectMapper.readValue(decodeValue, parameter.getParameterType());
             }
         }
 
