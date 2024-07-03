@@ -4,15 +4,14 @@ import com.example.gateway.common.ResponseMessage;
 import com.example.gateway.service.RedisService;
 import com.example.gateway.util.JwtUtil;
 import lombok.extern.log4j.Log4j2;
-import org.apache.http.HttpHeaders;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
+import java.util.Base64;
 
 
 @Component
@@ -51,8 +50,11 @@ public class LoginFilter extends AbstractGatewayFilterFactory<LoginFilter.Config
                 return jwtUtil.errorHandler(response, HttpStatus.BAD_REQUEST, ResponseMessage.Refresh_Token);
 
 
-            ServerHttpRequest builder = request.mutate().header("user", redisService.get(authorization)).build();
+            // 헤더 인코더
+            String user = config.encoder.encodeToString(redisService.get(authorization).getBytes());
 
+
+            ServerHttpRequest builder = request.mutate().header("user", user).build();
             log.info(request.getHeaders().toSingleValueMap());
 
             // 통과
@@ -62,5 +64,6 @@ public class LoginFilter extends AbstractGatewayFilterFactory<LoginFilter.Config
 
     public static class Config {
         // Put the configuration properties
+        Base64.Encoder encoder = Base64.getEncoder();
     }
 }
