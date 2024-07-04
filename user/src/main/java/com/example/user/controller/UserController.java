@@ -1,5 +1,6 @@
 package com.example.user.controller;
 
+import com.example.user.annotation.HeaderUserAuth;
 import com.example.user.common.ParseUtil;
 import com.example.user.dto.UpdateUserInfoDto;
 import com.example.user.dto.UserAuth;
@@ -31,9 +32,8 @@ public class UserController {
     }
 
     @GetMapping(value = "/auth/secured", headers = "user")
-    public ResponseEntity<String> AuthTest(@RequestHeader String user) throws JsonProcessingException {
-        log.info(user);
-        UserAuth userAuth = parseUtil.parseAuth(user);
+    public ResponseEntity<String> AuthTest(@HeaderUserAuth UserAuth userAuth) throws JsonProcessingException {
+
         log.info(userAuth);
 
         return ResponseEntity.ok("This is a secured test");

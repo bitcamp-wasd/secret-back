@@ -10,4 +10,5 @@ import lombok.ToString;
 public class UserAuth {
     private Long userId;
     private String role;
+    private String nickName;
 }
