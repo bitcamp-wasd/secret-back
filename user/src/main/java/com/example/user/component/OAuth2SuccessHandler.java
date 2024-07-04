@@ -14,6 +14,7 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 @Component
 @RequiredArgsConstructor
@@ -53,7 +54,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         refreshTokenCookie.setMaxAge(604800); // 7일
         response.addCookie(refreshTokenCookie);
 
-        response.sendRedirect("http://localhost:3000");
+        response.sendRedirect("http://localhost:3000/oauth/callback?accessToken=" + accessToken + "&refreshToken=" + refreshToken);
     }
 
 }

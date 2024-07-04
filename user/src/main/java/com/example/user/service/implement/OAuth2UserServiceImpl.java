@@ -42,11 +42,24 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
         String email = null;
         String nickname = null;
 
-        if (oauth2ClientName.equals("kakao")){
-            email = oAuth2User.getAttributes().get("id") + "@kakao";
-            nickname = generateRandomNickName("kakao_");
-
+        if (oauth2ClientName.equals("kakao")) {
+            // 카카오 사용자 정보 가져오기
+            Map<String, Object> kakaoAccount = (Map<String, Object>) oAuth2User.getAttributes().get("kakao_account");
+            email = (String) kakaoAccount.get("email");
+            nickname = (String) kakaoAccount.get("profile_nickname");
+            if (email == null) {
+                email = oAuth2User.getName() + "@kakao.com";  // 이메일이 없는 경우 고유 id를 사용하여 이메일 생성
+            }
+            if (nickname == null) {
+                nickname = generateRandomNickName("kakao_");
+            }
         }
+
+//        if (oauth2ClientName.equals("kakao")){
+//            email = oAuth2User.getAttributes().get("id") + "@kakao";
+//            nickname = generateRandomNickName("kakao_");
+//
+//        }
 
         if (oauth2ClientName.equals("naver")){
 
