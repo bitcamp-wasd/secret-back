@@ -31,35 +31,35 @@ public class AuthController {
     private final JwtProvider jwtProvider;
     private final RedisService redisService;
 
-    @PostMapping("/email-certification")
+    @PostMapping("/email/certification")
     public ResponseEntity<? super EmailCertificationResponseDto> emailCertification(
             @RequestBody @Valid EmailCertificationRequestDto requestBody){
         ResponseEntity<? super EmailCertificationResponseDto> response = authService.emailCertification(requestBody);
         return response;
     }
 
-    @PostMapping("/check-certification")
+    @PostMapping("/check/certification")
     public ResponseEntity<? super CheckCertificationResponseDto> checkCertification(
             @RequestBody @Valid CheckCertificationRequestDto requestBody){
         ResponseEntity<? super CheckCertificationResponseDto> response = authService.checkCertification(requestBody);
         return response;
     }
 
-    @PostMapping("/nickName-check")
+    @PostMapping("/nickname/check")
     public ResponseEntity<? super NickNameCheckResponseDto> nickNameCheck(
             @RequestBody @Valid NickNameCheckRequestDto requestBody){
         ResponseEntity<? super NickNameCheckResponseDto> response = authService.nickNameCheck(requestBody);
         return response;
     }
 
-    @PostMapping("/sign-up")
+    @PostMapping("/signup")
     public ResponseEntity<? super SignUpResponseDto> signUp(
             @RequestBody @Valid SignUpRequestDto requestBody){
         ResponseEntity<? super SignUpResponseDto> response = authService.signUp(requestBody);
         return response;
     }
 
-    @PostMapping("/sign-out")
+    @PostMapping("/signout")
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
         authService.logout(request,response);
 
@@ -69,7 +69,7 @@ public class AuthController {
         return ResponseEntity.ok().body("logged out successfully");
     }
 
-    @PostMapping("/sign-in")
+    @PostMapping("/signin")
     public ResponseEntity<? super SignInResponseDto> signIn(
             @RequestBody @Valid SignInRequestDto requestBody, HttpServletResponse response){
         ResponseEntity<? super SignInResponseDto> responseEntity  = authService.signIn(requestBody);

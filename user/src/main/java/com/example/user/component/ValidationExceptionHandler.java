@@ -1,6 +1,7 @@
 package com.example.user.component;
 
 import com.example.user.dto.response.ResponseDto;
+import com.example.user.dto.response.auth.NickNameCheckResponseDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -23,5 +24,15 @@ public class ValidationExceptionHandler {
     @ExceptionHandler(OAuth2AuthenticationException.class)
     public ResponseEntity<String> handleOAuth2AuthenticationException(OAuth2AuthenticationException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(DuplicateException.class)
+    public ResponseEntity<ResponseDto> duplicateExceptionHandler(DuplicateException ex) {
+        return NickNameCheckResponseDto.duplicateNickName();
+    }
+
+    @ExceptionHandler(PasswordFormatException.class)
+    public ResponseEntity<String> passwordFormatExceptionHandler(PasswordFormatException ex) {
+        return new ResponseEntity<>("Invalid password", HttpStatus.BAD_REQUEST);
     }
 }

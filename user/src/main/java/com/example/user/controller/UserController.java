@@ -2,20 +2,16 @@ package com.example.user.controller;
 
 import com.example.user.annotation.HeaderUserAuth;
 import com.example.user.common.ParseUtil;
-import com.example.user.dto.UpdateUserInfoDto;
-import com.example.user.dto.UserAuth;
-import com.example.user.dto.UserInfoBannerDto;
-import com.example.user.dto.UserInfoDto;
+import com.example.user.dto.info.UpdateUserInfoDto;
+import com.example.user.dto.info.UserAuth;
+import com.example.user.dto.info.UserInfoDto;
 import com.example.user.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -39,26 +35,23 @@ public class UserController {
         return ResponseEntity.ok("This is a secured test");
     }
 
-    // 유저 베너
-    @GetMapping("/myBanner")
-    public ResponseEntity<UserInfoBannerDto> getMyBanner(Authentication authentication){
-        Long userId = (Long) authentication.getPrincipal();
-        UserInfoBannerDto userInfoBannerDto = userService.getUserInfoBanner(userId);
-        return ResponseEntity.ok(userInfoBannerDto);
-    }
-
     // 유저 마이페이지
-    @GetMapping("/myInfo")
-    public ResponseEntity<UserInfoDto> getMyInfo(Authentication authentication){
-        Long userId = (Long) authentication.getPrincipal();
+    @GetMapping("/auth/myinfo")
+    public ResponseEntity<UserInfoDto> getMyInfo(@HeaderUserAuth UserAuth userAuth) throws JsonProcessingException{
+        Long userId = userAuth.getUserId();
         UserInfoDto userInfo = userService.getUserInfo(userId);
         return ResponseEntity.ok(userInfo);
     }
 
+    // 유저정보 가져오기
+
+
     // 유저 정보 수정
-    @PutMapping("/editInfo")
-    public ResponseEntity<?> updateEditInfo(Authentication authentication, @RequestBody @Valid UpdateUserInfoDto updateUserInfoDto){
-        Long userId = (Long) authentication.getPrincipal();
+    @PutMapping("/auth/editinfo")
+    public ResponseEntity<?> updateEditInfo(@HeaderUserAuth UserAuth userAuth,
+                                            @RequestBody @Valid UpdateUserInfoDto updateUserInfoDto
+                                            ) throws JsonProcessingException {
+        Long userId = userAuth.getUserId();
         userService.updateUser(userId, updateUserInfoDto);
         return ResponseEntity.ok().build();
     }
