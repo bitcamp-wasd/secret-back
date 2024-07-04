@@ -36,6 +36,13 @@ public class PostController {
         return ResponseEntity.ok(responseDto);
     }
 
+    /**
+     * 게시물을 카테고리 별로 필터 정렬하여 전송
+     * (미완)
+     * @param pageNumber
+     * @param sort
+     * @return
+     */
     @GetMapping()
     public ResponseEntity<Slice<PostResponseDto>> getPostList(@RequestParam("pageNumber") int pageNumber, @RequestParam("sort") String sort) {
 
@@ -44,6 +51,12 @@ public class PostController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * 게시물 삭제
+     * @param user
+     * @param id
+     * @return
+     */
     @DeleteMapping("auth")
     public ResponseEntity<Boolean> deletePost(@HeaderUserAuth UserAuth user, @RequestParam("id") Long id) {
         postService.deletePost(user, id);

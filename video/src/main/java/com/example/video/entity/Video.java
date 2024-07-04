@@ -50,4 +50,12 @@ public class Video {
         this.length = length;
         this.state = VideoState.UPLOADING;
     }
+
+    public void plusLikeCount() {
+        this.likeCount += 1;
+    }
+
+    public void minusLikeCount() {
+        this.likeCount -= 1;
+    }
 }
