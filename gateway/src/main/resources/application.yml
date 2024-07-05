@@ -4,7 +4,7 @@ spring:
 
   config:
     #    config server host
-    import: optional:configserver:http://localhost:8082
+    import: optional:configserver:http://10.0.8.8:8082
 
 
   profiles:
