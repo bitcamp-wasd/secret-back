@@ -210,7 +210,13 @@ public class AuthServiceImpl implements AuthService {
 
                 // 응답 헤더에서 액세스 토큰 제거
                 response.setHeader(HttpHeaders.AUTHORIZATION, "");
+            } else {
+                // 토큰이 유효하지 않은 경우 예외 처리
+                throw new IllegalArgumentException("Invalid access token");
             }
+        } else {
+            // 토큰이 없는 경우 예외 처리
+            throw new IllegalArgumentException("Access token is missing");
         }
     }
 }

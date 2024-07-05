@@ -1,6 +1,6 @@
 package com.example.user.common;
 
-import com.example.user.dto.UserAuth;
+import com.example.user.dto.info.UserAuth;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
