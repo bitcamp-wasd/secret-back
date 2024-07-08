@@ -26,6 +26,22 @@ public class PostController {
     private final PostService postService;
 
     /**
+     * 게시물을 카테고리 별로 필터 정렬하여 전송
+     * (미완)
+     * @param pageNumber
+     * @param sort
+     * @return
+     */
+    @PostMapping()
+    public ResponseEntity<Slice<PostResponseDto>> getPostList(@RequestParam("pageNumber") int pageNumber, @RequestParam("sort") String sort) {
+
+        Pageable pageable = PageRequest.of(pageNumber, 16, Sort.by(sort));
+        Slice<PostResponseDto>  response = postService.getPostList(pageable).map(Post::toPostResponseDto);
+        return ResponseEntity.ok(response);
+    }
+
+
+    /**
      * 게시물 등록
      * @param postRegisterDto 게시물 정보
      * @return 동영상, 이미지를 업로드하는데 사용될 Presigned URL
@@ -37,20 +53,6 @@ public class PostController {
         return ResponseEntity.ok(responseDto);
     }
 
-    /**
-     * 게시물을 카테고리 별로 필터 정렬하여 전송
-     * (미완)
-     * @param pageNumber
-     * @param sort
-     * @return
-     */
-    @GetMapping()
-    public ResponseEntity<Slice<PostResponseDto>> getPostList(@RequestParam("pageNumber") int pageNumber, @RequestParam("sort") String sort) {
-
-        Pageable pageable = PageRequest.of(pageNumber, 16, Sort.by(sort));
-        Slice<PostResponseDto>  response = postService.getPostList(pageable).map(Post::toPostResponseDto);
-        return ResponseEntity.ok(response);
-    }
 
     /**
      * 게시물 삭제

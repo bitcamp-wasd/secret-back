@@ -1,5 +1,6 @@
 package com.example.video.controller;
 
+import com.example.video.api.UserRestApi;
 import com.example.video.dto.auth.UserAuth;
 import com.example.video.global.annotation.HeaderUserAuth;
 import com.example.video.global.util.ParseUtil;
@@ -19,6 +20,7 @@ import java.nio.charset.StandardCharsets;
 public class TestController {
 
     private final ParseUtil parseUtil;
+    private final UserRestApi userRestApi;
 
     @GetMapping("/")
     public String test() {
@@ -29,5 +31,10 @@ public class TestController {
     public ResponseEntity<String> AuthTest(@HeaderUserAuth UserAuth user) throws JsonProcessingException {
         log.info(user);
         return ResponseEntity.ok("This is a secured test");
+    }
+
+    @GetMapping("openfeign")
+    public String openfeign(@RequestHeader("Authorization") String authorization) {
+        return userRestApi.test2(authorization);
     }
 }
