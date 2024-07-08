@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.battle.mapper.battleMapper">
+
+    <!-- 배틀 -->
+    <resultMap id="BattleResultMap" type="com.example.battle.entity.Battle">
+        <id property="battleId" column="battle_id"/>
+        <result property="postId1" column="post_id1"/>
+        <result property="postId2" column="post_id2"/>
+        <result property="title" column="title"/>
+        <result property="createDate" column="create_date"/>
+        <result property="endDate" column="end_date"/>
+        <result property="state" column="state"/>
+        <result property="vote1Cnt" column="vote1_cnt"/>
+        <result property="vote2Cnt" column="vote2_cnt"/>
+
+        <collection property="comments" ofType="com.example.battle.entity.BattleComment"
+                    column="battle_id" javaType="ArrayList">
+            <id column="battle_comment_id" property="battleCommentId"/>
+            <result column="create_date" property="createDate"/>
+            <result column="user_id" property="userId"/>
+            <result column="battle_id" property="battleId"/>
+            <result column="comment" property="comment"/>
+        </collection>
+
+        <collection property="voteList" ofType="com.example.battle.entity.BattleVoteList"
+                    column="battle_id" javaType="ArrayList">
+            <id column="battle_vote_id" property="battleVoteId"/>
+            <result column="battle_id" property="battleId"/>
+            <result column="user_id" property="userId"/>
+            <result column="post_id" property="postId"/>
+        </collection>
+    </resultMap>
+
+    <!--배틀 상세보기-->
+
+</mapper>
