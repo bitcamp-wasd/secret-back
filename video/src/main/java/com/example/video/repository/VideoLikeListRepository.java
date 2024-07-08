@@ -16,4 +16,5 @@ public interface VideoLikeListRepository extends JpaRepository<VideoLikeList, Lo
 
     @Query("SELECT v FROM VideoLikeList v WHERE v.video.id =:videoId AND v.userId=:userId")
     Optional<VideoLikeList> existVideoIdAndUserId(Long videoId, Long userId);
+
 }
