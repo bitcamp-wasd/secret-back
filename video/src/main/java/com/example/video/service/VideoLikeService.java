@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class PostLikeService {
+public class VideoLikeService {
 
     private final VideoRepository videoRepository;
     private final VideoLikeListRepository videoLikeListRepository;
@@ -24,11 +24,11 @@ public class PostLikeService {
     public boolean videoLike(UserAuth userAuth, Long videoId) {
 
         // 리스트 삭제, 삽입 후 좋아요 갯수 -1 or +1
-        Video video = videoRepository.findById(videoId).orElseThrow(() -> new IllegalArgumentException("video is not found"));
+        Video video = videoRepository.findByIdFetch(videoId).orElseThrow(() -> new IllegalArgumentException("video is not found"));
 
         VideoLikeList like = videoLikeListRepository.findVideoAndUserId(video, userAuth.getUserId()).orElse(null);
         // 리스트 삭제 좋아요 갯수 -1
-        if(like == null) {
+        if(like != null) {
             videoLikeListRepository.delete(like);
             video.minusLikeCount();
         }
@@ -38,6 +38,7 @@ public class PostLikeService {
             video.plusLikeCount();
         }
 
+        videoRepository.save(video);
         return true;
     }
 

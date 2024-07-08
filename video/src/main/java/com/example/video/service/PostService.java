@@ -6,18 +6,15 @@ import com.amazonaws.services.s3.Headers;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.example.video.dto.auth.UserAuth;
-import com.example.video.dto.post.PostRegisterDto;
-import com.example.video.dto.post.PostRegisterResponseDto;
-import com.example.video.dto.post.PostResponseDto;
+import com.example.video.dto.post.request.PostRegisterDto;
+import com.example.video.dto.post.response.PostRegisterResponseDto;
+import com.example.video.dto.post.response.MyPostDto;
 import com.example.video.entity.Category;
 import com.example.video.entity.Post;
 import com.example.video.entity.SheetMusic;
 import com.example.video.entity.Video;
 import com.example.video.global.util.Util;
-import com.example.video.repository.CategoryRepository;
-import com.example.video.repository.PostRepository;
-import com.example.video.repository.SheetMusicRepository;
-import com.example.video.repository.VideoRepository;
+import com.example.video.repository.*;
 import jakarta.persistence.PrePersist;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -29,7 +26,6 @@ import org.springframework.stereotype.Service;
 
 
 import java.net.URL;
-import java.nio.file.AccessDeniedException;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,6 +39,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final VideoRepository videoRepository;
     private final SheetMusicRepository sheetMusicRepository;
+    private final VideoLikeListRepository videoLikeListRepository;
 
     private final AmazonS3 amazonS3;
 
@@ -189,6 +186,14 @@ public class PostService {
             throw new IllegalArgumentException("해당 게시물을 삭제할 권한이 없습니다.");
 
         postRepository.delete(post);
+    }
+
+    public List<MyPostDto> myPost(UserAuth user, Pageable pageNumber) {
+
+        Long id = user.getUserId();
+        Slice<Post> posts = postRepository.findByUserId(id, pageNumber).orElse(null);
+        List<MyPostDto> myPosts = posts.stream().map(Post::toMyPostDto).toList();
+        return myPosts;
     }
 
 }
