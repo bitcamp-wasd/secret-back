@@ -3,6 +3,7 @@ package com.example.user.controller;
 import com.example.user.annotation.HeaderUserAuth;
 import com.example.user.common.ParseUtil;
 import com.example.user.dto.info.UpdateUserInfoDto;
+import com.example.user.dto.info.UserApiInfo;
 import com.example.user.dto.info.UserAuth;
 import com.example.user.dto.info.UserInfoDto;
 import com.example.user.service.UserService;
@@ -54,6 +55,15 @@ public class UserController {
         Long userId = userAuth.getUserId();
         userService.updateUser(userId, updateUserInfoDto);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("info")
+    public ResponseEntity<UserApiInfo> getUserApiInfo(@RequestParam("userId") Long userId
+                                                        ) throws JsonProcessingException {
+
+        UserApiInfo userApiInfo = userService.getUserApiInfo(userId);
+        return ResponseEntity.ok(userApiInfo);
+
     }
 
 }

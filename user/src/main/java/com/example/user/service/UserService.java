@@ -3,6 +3,7 @@ package com.example.user.service;
 import com.example.user.component.DuplicateException;
 import com.example.user.component.PasswordFormatException;
 import com.example.user.dto.info.UpdateUserInfoDto;
+import com.example.user.dto.info.UserApiInfo;
 import com.example.user.dto.info.UserInfoDto;
 import com.example.user.entity.UserEntity;
 import com.example.user.entity.UserRankEntity;
@@ -74,5 +75,17 @@ public class UserService {
         userEntity.setNickname(dto.getNickName());
         userEntity.setPassword(passwordEncoder.encode(password));
         userRepository.save(userEntity);
+    }
+
+    public UserApiInfo getUserApiInfo(Long userId){
+
+        UserEntity userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        UserApiInfo userApiInfo = new UserApiInfo(
+                userEntity.getNickname(),
+                userEntity.getRankId().getRankName()
+        );
+        return userApiInfo;
     }
 }
