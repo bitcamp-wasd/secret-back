@@ -1,6 +1,7 @@
 package com.example.video.entity;
 
-import com.example.video.dto.post.PostResponseDto;
+import com.example.video.dto.post.response.PostResponseDto;
+import com.example.video.dto.post.response.MyPostDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -41,7 +42,7 @@ public class Post {
     private String userNickname;
 
     @Column(name="upload_date")
-    private LocalDate uploadDate;
+    private LocalDateTime uploadDate;
 
     @ColumnDefault("0")
     private Long views;
@@ -59,7 +60,7 @@ public class Post {
         this.video = video;
         this.userId = userId;
         this.userNickname = userNickname;
-        this.uploadDate = LocalDate.now();
+        this.uploadDate = LocalDateTime.now();
     }
 
     public PostResponseDto toPostResponseDto() {
@@ -73,6 +74,22 @@ public class Post {
                 userNickname
         );
     }
+
+    public static MyPostDto toMyPostDto(Post post) {
+
+        Video video = post.getVideo();
+
+        return new MyPostDto(
+                video.getId(),
+                post.getThumbnailPath(),
+                post.getTitle(),
+                post.getViews(),
+                video.getLength(),
+                post.getUserNickname()
+        );
+    }
+
+
 
 
 }

@@ -1,8 +1,9 @@
 package com.example.video.controller;
 import com.example.video.dto.auth.UserAuth;
-import com.example.video.dto.post.PostRegisterDto;
-import com.example.video.dto.post.PostRegisterResponseDto;
-import com.example.video.dto.post.PostResponseDto;
+import com.example.video.dto.post.request.PostRegisterDto;
+import com.example.video.dto.post.response.PostRegisterResponseDto;
+import com.example.video.dto.post.response.PostResponseDto;
+import com.example.video.dto.post.response.MyPostDto;
 import com.example.video.entity.Post;
 import com.example.video.global.annotation.HeaderUserAuth;
 import com.example.video.service.PostService;
@@ -61,6 +62,13 @@ public class PostController {
     public ResponseEntity<Boolean> deletePost(@HeaderUserAuth UserAuth user, @RequestParam("id") Long id) {
         postService.deletePost(user, id);
         return ResponseEntity.ok(true);
+    }
+
+    @GetMapping("auth/myposts")
+    public ResponseEntity<List<MyPostDto>> myPosts(@HeaderUserAuth UserAuth user, @RequestParam("pageNumber") int pageNumber) {
+        Pageable page = PageRequest.of(pageNumber, 10, Sort.by("uploadDate").descending());
+        List<MyPostDto> myPosts = postService.myPost(user, page);
+        return ResponseEntity.ok(myPosts);
     }
 
 }

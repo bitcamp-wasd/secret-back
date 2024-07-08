@@ -1,4 +1,4 @@
-package com.example.video.dto.post;
+package com.example.video.dto.post.request;
 
 import lombok.Getter;
 import lombok.Setter;

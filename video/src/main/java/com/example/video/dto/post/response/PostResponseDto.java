@@ -1,10 +1,11 @@
-package com.example.video.dto.post;
+package com.example.video.dto.post.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -15,7 +16,7 @@ public class PostResponseDto {
     private String thumbnail;
     private String title;
     private Long views;
-    private LocalDate uploadDate;
+    private LocalDateTime uploadDate;
     private int length;
     private String nickName;
 }
