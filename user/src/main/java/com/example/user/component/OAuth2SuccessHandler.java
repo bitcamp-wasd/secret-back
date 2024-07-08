@@ -53,7 +53,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         refreshTokenCookie.setMaxAge(604800); // 7일
         response.addCookie(refreshTokenCookie);
 
-        response.sendRedirect("http://localhost:3000/oauth/callback?accessToken=" + accessToken + "&refreshToken=" + refreshToken);
+        response.sendRedirect("http://223.130.154.204/oauth/callback?accessToken=" + accessToken + "&refreshToken=" + refreshToken);
     }
 
 }
