@@ -20,7 +20,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("SELECT p FROM Post p JOIN FETCH p.video WHERE p.userId=:userId")
     Optional<Slice<Post>> findByUserId(Long userId, Pageable page);
 
-    @Query("SELECT p FROM Post p JOIN FETCH p.category JOIN FETCH p.video WHERE :categories IS NULL OR p.category.category IN (:categories) ")
+    @Query("SELECT p FROM Post p JOIN FETCH p.category JOIN FETCH p.video")
     Optional<Slice<Post>> findAllFetch(Pageable page);
 
     @Query("SELECT p FROM Post p JOIN FETCH p.category JOIN FETCH p.video WHERE p.category.category IN (:categories) ")
