@@ -32,13 +32,13 @@ public class PostController {
      * @param sort
      * @return
      */
-    @PostMapping()
-    public ResponseEntity<Slice<PostResponseDto>> getPostList(@RequestParam("pageNumber") int pageNumber, @RequestParam("sort") String sort) {
-
-        Pageable pageable = PageRequest.of(pageNumber, 16, Sort.by(sort));
-        Slice<PostResponseDto>  response = postService.getPostList(pageable).map(Post::toPostResponseDto);
-        return ResponseEntity.ok(response);
-    }
+//    @PostMapping()
+//    public ResponseEntity<List<PostResponseDto>> getPostList(@RequestParam("pageNumber") int pageNumber, @RequestParam("sort") String sort) {
+//
+//        Pageable pageable = PageRequest.of(pageNumber, 16, Sort.by(sort));
+//        List<PostResponseDto>  response = postService.getPostList(pageable).map(Post::toPostResponseDto).toList();
+//        return ResponseEntity.ok(response);
+//    }
 
 
     /**

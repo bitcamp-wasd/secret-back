@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserApiInfo {
-    private String nickName;
+    private String nickname;
     private String rankName;
 
 }

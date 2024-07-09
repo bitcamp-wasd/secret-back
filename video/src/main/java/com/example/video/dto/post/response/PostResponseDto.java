@@ -12,11 +12,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class PostResponseDto {
 
-    private Long video_id;
+    private Long videoId;
     private String thumbnail;
     private String title;
     private Long views;
     private LocalDateTime uploadDate;
     private int length;
-    private String nickName;
+    private String nickname;
 }
