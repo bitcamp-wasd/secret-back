@@ -89,6 +89,13 @@ public class Post {
         );
     }
 
+    /**
+     * 조회수 증가
+     */
+    public void plusViews() {
+        this.views += 1;
+    }
+
 
 
 

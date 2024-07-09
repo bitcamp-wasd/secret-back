@@ -12,7 +12,7 @@ import lombok.Setter;
 public class UserInfoDto {
 
     private String email;
-    private String nickName;
+    private String nickname;
     private String rankName;
     private int point;
 }
