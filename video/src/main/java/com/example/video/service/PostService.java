@@ -168,10 +168,13 @@ public class PostService {
      * @param pageable
      * @return
      */
-//    public Slice<Post> getPostList(List<Category> categories, Pageable pageable) {
-//
-//        return postRepository.findAllFetch(categories, pageable).orElse(null);
-//    }
+    public Slice<Post> getPostList(List<String> categories, Pageable pageable) {
+
+        if(categories.size() == 0)
+            return postRepository.findAllFetch(pageable).orElse(null);
+
+        return postRepository.findAllFetch(categories, pageable).orElse(null);
+    }
 
     /**
      * 게시물 삭제

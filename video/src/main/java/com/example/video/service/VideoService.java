@@ -5,6 +5,7 @@ import com.example.video.dto.post.response.VideoResponseDto;
 import com.example.video.dto.user.response.UserInfoDto;
 import com.example.video.entity.Post;
 import com.example.video.entity.Video;
+import com.example.video.repository.PostRepository;
 import com.example.video.repository.VideoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,9 @@ public class VideoService {
         post.plusViews();
 
         UserInfoDto userInfoDto = userRestApi.userInfo(video.getPost().getUserId());
+
+        videoRepository.save(video);
+
         return video.toVideoReponseDto(video, userInfoDto);
     }
 
