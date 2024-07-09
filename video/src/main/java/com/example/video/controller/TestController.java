@@ -33,6 +33,7 @@ public class TestController {
         return ResponseEntity.ok("This is a secured test");
     }
 
+
     @GetMapping("openfeign")
     public String openfeign(@RequestHeader("Authorization") String authorization) {
         return userRestApi.test2(authorization);

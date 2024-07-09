@@ -19,4 +19,5 @@ public class PostResponseDto {
     private LocalDateTime uploadDate;
     private int length;
     private String nickname;
+    private String category;
 }

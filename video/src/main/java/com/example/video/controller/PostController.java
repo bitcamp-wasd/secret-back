@@ -1,5 +1,6 @@
 package com.example.video.controller;
 import com.example.video.dto.auth.UserAuth;
+import com.example.video.dto.post.request.PostListDto;
 import com.example.video.dto.post.request.PostRegisterDto;
 import com.example.video.dto.post.response.PostRegisterResponseDto;
 import com.example.video.dto.post.response.PostResponseDto;
@@ -29,16 +30,16 @@ public class PostController {
      * 게시물을 카테고리 별로 필터 정렬하여 전송
      * (미완)
      * @param pageNumber
-     * @param sort
+     * @param
      * @return
      */
-//    @PostMapping()
-//    public ResponseEntity<List<PostResponseDto>> getPostList(@RequestParam("pageNumber") int pageNumber, @RequestParam("sort") String sort) {
-//
-//        Pageable pageable = PageRequest.of(pageNumber, 16, Sort.by(sort));
-//        List<PostResponseDto>  response = postService.getPostList(pageable).map(Post::toPostResponseDto).toList();
-//        return ResponseEntity.ok(response);
-//    }
+    @PostMapping()
+    public ResponseEntity<List<PostResponseDto>> getPostList(@RequestParam("pageNumber") int pageNumber, @RequestBody PostListDto postListDto) {
+
+        Pageable pageable = PageRequest.of(pageNumber, 16, Sort.by(postListDto.getSort()).descending());
+        List<PostResponseDto>  response = postService.getPostList(postListDto.getCategory(),pageable).map(Post::toPostResponseDto).toList();
+        return ResponseEntity.ok(response);
+    }
 
 
     /**

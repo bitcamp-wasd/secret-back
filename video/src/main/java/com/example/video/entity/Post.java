@@ -5,6 +5,7 @@ import com.example.video.dto.post.response.MyPostDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
@@ -71,7 +72,8 @@ public class Post {
                 views,
                 uploadDate,
                 video.getLength(),
-                userNickname
+                userNickname,
+                category.getCategory()
         );
     }
 
