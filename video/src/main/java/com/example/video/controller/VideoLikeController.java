@@ -17,6 +17,12 @@ public class VideoLikeController {
 
     private final VideoLikeService videoLikeService;
 
+    @GetMapping("auth/check")
+    public ResponseEntity<Boolean> likeCheck(@HeaderUserAuth UserAuth userAuth, @RequestParam("id") Long videoId) {
+        Boolean check = videoLikeService.isLike(userAuth, videoId);
+        return ResponseEntity.ok(check);
+    }
+
     @GetMapping("auth")
     public ResponseEntity<String> videoLike(@HeaderUserAuth UserAuth userAuth, @RequestParam("id") Long videoId) {
         videoLikeService.videoLike(userAuth, videoId);
