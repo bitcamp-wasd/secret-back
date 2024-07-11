@@ -2,6 +2,7 @@ package com.example.video.entity;
 
 import com.example.video.dto.post.response.PostResponseDto;
 import com.example.video.dto.post.response.MyPostDto;
+import com.example.video.dto.post.response.VideoApiDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -88,6 +89,18 @@ public class Post {
                 post.getViews(),
                 video.getLength(),
                 post.getUserNickname()
+        );
+    }
+
+    public VideoApiDto toVideoApiDto() {
+        return new VideoApiDto(
+                this.getVideo().getId(),
+                this.getTitle(),
+                this.getThumbnailPath(),
+                this.getUserNickname(),
+                this.getViews(),
+                this.getUploadDate(),
+                this.video.getLength()
         );
     }
 

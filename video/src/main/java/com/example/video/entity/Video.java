@@ -1,5 +1,6 @@
 package com.example.video.entity;
 
+import com.example.video.dto.post.response.VideoApiDto;
 import com.example.video.dto.post.response.VideoResponseDto;
 import com.example.video.dto.user.response.UserInfoDto;
 import com.example.video.entity.state.VideoState;
@@ -72,6 +73,8 @@ public class Video {
                 video.getCommentCount()
         );
     }
+
+
 
     // 좋아요 수
     public void plusLikeCount() {
