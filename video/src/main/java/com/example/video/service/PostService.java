@@ -7,8 +7,10 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.example.video.dto.auth.UserAuth;
 import com.example.video.dto.post.request.PostRegisterDto;
+import com.example.video.dto.post.request.PostSortDto;
 import com.example.video.dto.post.response.PostRegisterResponseDto;
 import com.example.video.dto.post.response.MyPostDto;
+import com.example.video.dto.post.response.PostResponseDto;
 import com.example.video.entity.Category;
 import com.example.video.entity.Post;
 import com.example.video.entity.SheetMusic;
@@ -177,6 +179,27 @@ public class PostService {
     }
 
     /**
+     * 검색 결과
+     * @param search
+     * @param categories
+     * @param pageable
+     * @return
+     */
+    public List<PostResponseDto> searchPostList(String search, List<String> categories, Pageable pageable) {
+
+        if(categories.size() == 0)
+            return postRepository.findByTitle(search, pageable).orElseThrow(() -> new IllegalArgumentException("검색 결과가 없습니다."))
+                    .stream()
+                    .map(Post::toPostResponseDto)
+                    .toList();
+        
+        return postRepository.findByTitle(search, categories ,pageable).orElseThrow(() -> new IllegalArgumentException("검색 결과가 없습니다."))
+                .stream()
+                .map(Post::toPostResponseDto)
+                .toList();
+    }
+
+    /**
      * 게시물 삭제
      * @param user
      * @param id
@@ -198,5 +221,6 @@ public class PostService {
         List<MyPostDto> myPosts = posts.stream().map(Post::toMyPostDto).toList();
         return myPosts;
     }
+
 
 }
