@@ -19,12 +19,16 @@ public class BattleComment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long battleCommentId;
 
-    @Column(name = "create_date", columnDefinition = "DATE DEFAULT 등록날짜")
+    @Column(name = "create_date")
     private LocalDate createDate=LocalDate.now();
 
+    // api 적용시 조인 제거
+    @Column(name = "user_id")
     private Long userId;
 
-    private Long battleId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "battle_id")
+    private Battle battle;
 
     private String comment;
 }

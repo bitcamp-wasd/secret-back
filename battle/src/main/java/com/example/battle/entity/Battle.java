@@ -1,14 +1,12 @@
 package com.example.battle.entity;
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Setter
@@ -22,33 +20,35 @@ public class Battle {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long battleId;
 
+    @Column(name = "post_id1")
     private Long postId1;
 
+    @Column(name = "post_id2")
     private Long postId2;
 
+    @Column(name = "user_id")
     private Long userId;
 
     private String title;
 
-    @Column(name = "create_date", columnDefinition = "DATE DEFAULT 등록날짜")
+    @Column(name = "create_date")
     private LocalDate createDate = LocalDate.now();
 
-    @Column(name = "end_date", columnDefinition = "DATE DEFAULT 등록날짜 + INTERVAL 7 DAY")
+    @Column(name = "end_date")
     private LocalDate endDate = LocalDate.now().plusWeeks(1);
 
-    @Column(columnDefinition = "DEFAULT '진행중'")
     private String state = "진행중";
 
-    @Column(columnDefinition = "투표수 DEFAULT 0")
-    private Long vote1Cnt;
+    @ColumnDefault("0")
+    @Column(name = "vote1_cnt")
+    private int vote1Cnt;
 
-    @Column(columnDefinition = "투표수 DEFAULT 0")
-    private Long vote2Cnt;
+    @ColumnDefault("0")
+    @Column(name = "vote2_cnt")
+    private int vote2Cnt;
 
-    @OneToMany(mappedBy = "battleId", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<BattleVoteList> voteList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "battleId", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<BattleComment> comments = new ArrayList<>();
+    @ColumnDefault("0")
+    @Column(name = "views")
+    private int views;
 
 }
