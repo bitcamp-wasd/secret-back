@@ -1,6 +1,6 @@
 package com.example.video.controller;
 import com.example.video.dto.auth.UserAuth;
-import com.example.video.dto.post.request.PostListDto;
+import com.example.video.dto.post.request.PostSortDto;
 import com.example.video.dto.post.request.PostRegisterDto;
 import com.example.video.dto.post.response.PostRegisterResponseDto;
 import com.example.video.dto.post.response.PostResponseDto;
@@ -11,7 +11,6 @@ import com.example.video.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,16 +27,26 @@ public class PostController {
 
     /**
      * 게시물을 카테고리 별로 필터 정렬하여 전송
-     * (미완)
+     *
      * @param pageNumber
      * @param
      * @return
      */
     @PostMapping()
-    public ResponseEntity<List<PostResponseDto>> getPostList(@RequestParam("pageNumber") int pageNumber, @RequestBody PostListDto postListDto) {
+    public ResponseEntity<List<PostResponseDto>> getPostList(@RequestParam("pageNumber") int pageNumber, @RequestBody PostSortDto postSortDto) {
 
-        Pageable pageable = PageRequest.of(pageNumber, 16, Sort.by(postListDto.getSort()).descending());
-        List<PostResponseDto>  response = postService.getPostList(postListDto.getCategory(),pageable).map(Post::toPostResponseDto).toList();
+        Pageable pageable = PageRequest.of(pageNumber, 16, Sort.by(postSortDto.getSort()).descending());
+        List<PostResponseDto>  response = postService.getPostList(postSortDto.getCategory(),pageable).map(Post::toPostResponseDto).toList();
+        return ResponseEntity.ok(response);
+    }
+
+
+    @PostMapping("search")
+    public ResponseEntity<List<PostResponseDto>> searchPost(@RequestParam("search") String search,
+                                                            @RequestParam("pageNumber") int pageNumber,
+                                                            @RequestBody PostSortDto postSortDto) {
+        Pageable pageable = PageRequest.of(pageNumber, 16, Sort.by(postSortDto.getSort()).descending());
+        List<PostResponseDto> response = postService.searchPostList(search, postSortDto.getCategory(), pageable);
         return ResponseEntity.ok(response);
     }
 
@@ -67,6 +76,12 @@ public class PostController {
         return ResponseEntity.ok(true);
     }
 
+    /**
+     * 나의 게시물 조회
+     * @param user
+     * @param pageNumber
+     * @return
+     */
     @GetMapping("auth/myposts")
     public ResponseEntity<List<MyPostDto>> myPosts(@HeaderUserAuth UserAuth user, @RequestParam("pageNumber") int pageNumber) {
         Pageable page = PageRequest.of(pageNumber, 10, Sort.by("uploadDate").descending());

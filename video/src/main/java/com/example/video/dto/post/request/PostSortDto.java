@@ -7,7 +7,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class PostListDto {
+public class PostSortDto {
 
     private String sort;
     private List<String> category;
