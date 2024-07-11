@@ -31,4 +31,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query("SELECT p FROM Post p JOIN FETCH p.category JOIN FETCH p.video WHERE p.title LIKE CONCAT('%', :title ,'%') AND p.category.category IN (:categories)")
     Optional<Slice<Post>> findByTitle(String title, List<String> categories, Pageable page);
+
+    @Query("SELECT p FROM Post p JOIN FETCH p.video WHERE p.postId = :postId")
+    Optional<Post> findByIdFetchVideo(Long postId);
 }

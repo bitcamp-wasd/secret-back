@@ -8,9 +8,7 @@ import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.example.video.dto.auth.UserAuth;
 import com.example.video.dto.post.request.PostRegisterDto;
 import com.example.video.dto.post.request.PostSortDto;
-import com.example.video.dto.post.response.PostRegisterResponseDto;
-import com.example.video.dto.post.response.MyPostDto;
-import com.example.video.dto.post.response.PostResponseDto;
+import com.example.video.dto.post.response.*;
 import com.example.video.entity.Category;
 import com.example.video.entity.Post;
 import com.example.video.entity.SheetMusic;
@@ -223,4 +221,8 @@ public class PostService {
     }
 
 
+    public VideoApiDto getVideo(Long postId) {
+        Post post = postRepository.findByIdFetchVideo(postId).orElseThrow(() -> new IllegalArgumentException("게시물이 존재하지 않습니다."));
+        return post.toVideoApiDto();
+    }
 }
