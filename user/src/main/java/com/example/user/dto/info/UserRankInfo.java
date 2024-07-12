@@ -1,4 +1,4 @@
-package com.example.battle.dto.info;
+package com.example.user.dto.info;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,8 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDto {
-    private Long userId;
+public class UserRankInfo {
     private String nickname;
     private String imagePath;
 }

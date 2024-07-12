@@ -1,6 +1,6 @@
 package com.example.battle.dto;
 
-import com.example.battle.dto.info.PostDto;
+import com.example.battle.dto.post.response.PostInfoDto;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -23,7 +23,7 @@ public class BattleDto {
     private Long vote2Cnt;
 
     // 나중 api 형식으로 변환
-    private PostDto postId1;
-    private PostDto postId2;
+    private PostInfoDto postId1;
+    private PostInfoDto postId2;
 
 }
