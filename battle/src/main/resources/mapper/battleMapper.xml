@@ -100,6 +100,43 @@
         LIMIT #{pageable.offset}, #{pageable.pageSize}
     </select>
 
+    <!--배틀 게시판 리스트-->
+    <resultMap id="BattleResultMap" type="com.example.battle.entity.Battle">
+        <id property="battleId" column="battle_id" />
+        <result property="title" column="title" />
+        <result property="views" column="views" />
+        <result property="endDate" column="end_date" />
+        <result property="vote1Cnt" column="vote1_cnt" />
+        <result property="vote2Cnt" column="vote2_cnt" />
+        <result property="postId1" column="post_id1" />
+        <result property="postId2" column="post_id2" />
+    </resultMap>
+
+
+    <select id="findByStateBattle" parameterType="map" resultMap="BattleResultMap">
+        SELECT * FROM battle
+        WHERE state = #{state}
+        ORDER BY create_date DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+    
+    <select id="countByState"  parameterType="string" resultType="int">
+        SELECT COUNT(*) FROM battle
+        WHERE state = #{state}
+    </select>
+
+    <select id="findByMyBattle" parameterType="map" resultMap="BattleResultMap">
+        SELECT * FROM battle
+        WHERE user_id = #{userId}
+        ORDER BY create_date DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countByMyBattle" parameterType="long" resultType="int">
+        SELECT COUNT(*) FROM battle
+        WHERE user_id = #{userId}
+    </select>
+
 
 
 
@@ -133,22 +170,4 @@
 <!--        ORDER BY b.create_date DESC-->
 <!--            LIMIT #{limit} OFFSET #{offset}-->
 <!--    </select>-->
-
-    <!--
-        진행 중인 배틀 리스트
-        무한 스크롤 slice
-    -->
-<!--    <select id="selectBattle" resultMap="BattleResultMap">-->
-<!--        SELECT b.*, v.*, c.*, p.title as postTitle1, p2.title as postTitle2, u.nickname-->
-<!--        FROM battle b-->
-<!--                 LEFT JOIN battle_vote_list v ON b.battle_id = v.battle_id-->
-<!--                 LEFT JOIN battle_comment c ON b.battle_id = c.battle_id-->
-<!--                 LEFT JOIN post p ON b.post_id1 = p.post_id-->
-<!--                 LEFT JOIN post p2 ON b.post_id2 = p2.post_id-->
-<!--                 LEFT JOIN user u ON b.user_id = u.user_id-->
-<!--        WHERE b.state = '진행중'-->
-<!--        ORDER BY b.create_date DESC-->
-<!--            LIMIT #{limit} OFFSET #{offset}-->
-<!--    </select>-->
-
 </mapper>

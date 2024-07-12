@@ -14,10 +14,23 @@ import java.util.List;
 @Mapper
 public interface BattleMapper {
 
+    // 내 배틀 게시글
+    List<Battle> findByMyBattle(@Param("userId") Long userId,
+                                @Param("limit") int limit,
+                                @Param("offset") int offset);
+
+    int countByMyBattle(@Param("userId") Long userId);
+
     // 배틀 게시글
     void incrementViews(Long battleId);
 
     Battle getBattleById(@Param("battleId") Long battleId);
+
+    List<Battle> findByStateBattle(@Param("state") String state,
+                                   @Param("limit") int limit,
+                                   @Param("offset") int offset);
+
+    int countByState(@Param("state") String state);
 
     // 투표
     void insertBattleVote(@Param("battleId") Long battleId,
