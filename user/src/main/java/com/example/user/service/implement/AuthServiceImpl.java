@@ -1,6 +1,7 @@
 package com.example.user.service.implement;
 
 import com.example.user.common.CertificationNumber;
+import com.example.user.common.ValidationUtil;
 import com.example.user.dto.request.auth.*;
 import com.example.user.dto.response.ResponseDto;
 import com.example.user.dto.response.auth.*;
@@ -19,8 +20,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -32,13 +31,12 @@ import org.springframework.stereotype.Service;
 @Log4j2
 public class AuthServiceImpl implements AuthService {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthServiceImpl.class);
-
     private final UserRepository userRepository;
     private final RedisService redisService;
     private final JwtProvider jwtProvider;
     private final EmailProvider emailProvider;
     private final UserRankRepository userRankRepository;
+    private final ValidationUtil validationUtil;
 
     private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -48,6 +46,10 @@ public class AuthServiceImpl implements AuthService {
         try {
 
             String nickName = dto.getNickName();
+
+            if (!validationUtil.isValidNickname(nickName)){
+                return NickNameCheckResponseDto.invalidNickName();
+            }
 
             boolean isExistNickName = userRepository.existsByNickname(nickName);
             if (isExistNickName)
@@ -134,6 +136,10 @@ public class AuthServiceImpl implements AuthService {
             dto.setPassword(encodePassword);
 
             String nickName = dto.getNickName();
+
+            if (!validationUtil.isValidNickname(nickName)){
+                return NickNameCheckResponseDto.invalidNickName();
+            }
 
             boolean isExistNickName = userRepository.existsByNickname(nickName);
             if (isExistNickName)

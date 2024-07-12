@@ -1,7 +1,9 @@
 package com.example.battle.controller;
 
+import com.example.battle.annotation.HeaderUserAuth;
 import com.example.battle.dto.BattleDto;
 import com.example.battle.dto.CommentDto;
+import com.example.battle.dto.auth.UserAuth;
 import com.example.battle.service.BattleCommentService;
 import com.example.battle.service.BattleService;
 import com.example.battle.service.BattleVoteService;
@@ -34,9 +36,9 @@ public class BattleController {
     // 배틀 투표
     @PostMapping("/{battleId}/vote")
     public ResponseEntity<String> vote(@PathVariable Long battleId,
-                                       @RequestParam Long userId,
+                                       @HeaderUserAuth UserAuth user,
                                        @RequestParam Long postId) {
-        battleVoteService.vote(battleId, userId, postId);
+        battleVoteService.vote(battleId, user.getUserId(), postId);
         return ResponseEntity.ok("Vote successful");
     }
 
@@ -50,9 +52,9 @@ public class BattleController {
 
     @PostMapping("/{battleId}/comment")
     public ResponseEntity<String> addComment(@PathVariable Long battleId,
-                                             @RequestParam Long userId,
+                                             @HeaderUserAuth UserAuth user,
                                              @RequestBody CommentDto commentDto) {
-        battleCommentService.addComment(battleId, userId, commentDto.getComment());
+        battleCommentService.addComment(battleId, user.getUserId(), commentDto.getComment());
         return ResponseEntity.ok("댓글이 성공적으로 추가되었습니다.");
     }
 
@@ -60,17 +62,17 @@ public class BattleController {
     @PutMapping("/{battleId}/update/{battleCommentId}")
     public ResponseEntity<String> updateComment(@PathVariable Long battleId,
                                                 @PathVariable Long battleCommentId,
-                                                @RequestParam Long userId,
+                                                @HeaderUserAuth UserAuth user,
                                                 @RequestBody CommentDto commentDto){
-        battleCommentService.updateComment(battleId, battleCommentId, userId, commentDto.getComment());
+        battleCommentService.updateComment(battleId, battleCommentId, user.getUserId(), commentDto.getComment());
         return ResponseEntity.ok("Comment Update successful");
     }
 
     @DeleteMapping("/{battleId}/delete/{battleCommentId}")
     public ResponseEntity<String> deleteComment(@PathVariable Long battleId,
                                                 @PathVariable Long battleCommentId,
-                                                @RequestParam Long userId){
-        battleCommentService.deleteComment(battleId,battleCommentId, userId);
+                                                @HeaderUserAuth UserAuth user){
+        battleCommentService.deleteComment(battleId,battleCommentId, user.getUserId());
         return ResponseEntity.ok("Comment Delete successful");
     }
 

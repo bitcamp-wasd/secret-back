@@ -1,10 +1,13 @@
 package com.example.user.service;
 
-import com.example.user.component.DuplicateException;
-import com.example.user.component.PasswordFormatException;
+import com.example.user.common.ValidationUtil;
+import com.example.user.component.Exception.DuplicateException;
+import com.example.user.component.Exception.NicknameFormatException;
+import com.example.user.component.Exception.PasswordFormatException;
 import com.example.user.dto.info.UpdateUserInfoDto;
 import com.example.user.dto.info.UserApiInfo;
 import com.example.user.dto.info.UserInfoDto;
+import com.example.user.dto.info.UserRankInfo;
 import com.example.user.entity.UserEntity;
 import com.example.user.entity.UserRankEntity;
 import com.example.user.repository.UserRankRepository;
@@ -22,6 +25,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserRankRepository userRankRepository;
+    private final ValidationUtil validationUtil;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     private boolean isValidPassword(String password) {
@@ -59,8 +63,13 @@ public class UserService {
         UserEntity userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
+        String nickname = dto.getNickName();
 
-        if (!userEntity.getNickname().equals(dto.getNickName())){
+        if (!validationUtil.isValidNickname(nickname)){
+            throw new NicknameFormatException("닉네임 형식에 맞춰주세요");
+        }
+
+        if (!userEntity.getNickname().equals(nickname)){
             boolean isExistNickName = userRepository.existsByNickname(dto.getNickName());
             if (isExistNickName){
                 throw new DuplicateException("Nickname already exists");
@@ -87,5 +96,17 @@ public class UserService {
                 userEntity.getRankId().getRankName()
         );
         return userApiInfo;
+    }
+
+    public UserRankInfo getRankApiInfo(Long userId){
+
+        UserEntity userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        UserRankInfo userRankInfo = new UserRankInfo(
+                userEntity.getNickname(),
+                userEntity.getRankId().getImagePath()
+        );
+        return userRankInfo;
     }
 }

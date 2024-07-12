@@ -1,4 +1,4 @@
-package com.example.user.component;
+package com.example.user.component.Exception;
 
 import com.example.user.dto.response.ResponseDto;
 import com.example.user.dto.response.auth.NickNameCheckResponseDto;
@@ -34,5 +34,10 @@ public class ValidationExceptionHandler {
     @ExceptionHandler(PasswordFormatException.class)
     public ResponseEntity<String> passwordFormatExceptionHandler(PasswordFormatException ex) {
         return new ResponseEntity<>("Invalid password", HttpStatus.BAD_REQUEST);
+    }
+    
+    @ExceptionHandler(NicknameFormatException.class)
+    public ResponseEntity<String> nicknameFormatExceptionHandler(NicknameFormatException ex) {
+        return new ResponseEntity<>("Invalid nickname", HttpStatus.BAD_REQUEST);
     }
 }

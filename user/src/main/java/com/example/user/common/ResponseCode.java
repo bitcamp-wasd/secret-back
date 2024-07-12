@@ -8,6 +8,8 @@ public interface ResponseCode {
     String DUPLICATE_EMAIL = "DE";
     String DUPLICATE_NICKNAME = "DN";
 
+    String INVALID_NICKNAME = "IN";
+
     String SIGN_IN_FAIL = "SF";
     String CERTIFICATION_FAIL = "CF";
 

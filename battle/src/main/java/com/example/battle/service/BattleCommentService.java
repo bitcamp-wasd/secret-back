@@ -1,7 +1,8 @@
 package com.example.battle.service;
 
+import com.example.battle.api.UserRestApi;
 import com.example.battle.dto.CommentDto;
-import com.example.battle.dto.info.UserDto;
+import com.example.battle.dto.user.response.UserRankInfoDto;
 import com.example.battle.entity.Battle;
 import com.example.battle.entity.BattleComment;
 import com.example.battle.mapper.BattleMapper;
@@ -24,28 +25,13 @@ import java.util.stream.Collectors;
 public class BattleCommentService {
 
     private final BattleMapper battleMapper;
-
-    private List<UserDto> mockUserData() {
-        // 임의의 유저 데이터를 생성합니다.
-        return List.of(
-                new UserDto(1L, "user1", "/images/user1.png"),
-                new UserDto(2L, "user2", "/images/user2.png")
-        );
-    }
-
-    private UserDto getUserInfo(Long userId) {
-        // 임의의 유저 데이터를 가져옵니다.
-        return mockUserData().stream()
-                .filter(user -> user.getUserId().equals(userId))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("User not found"));
-    }
+    private final UserRestApi userRestApi;
 
     public Page<CommentDto> getComments(Long battleId, Pageable pageable) {
         List<BattleComment> comments = battleMapper.getCommentsByBattleId(battleId, pageable);
         List<CommentDto> commentListDto = comments.stream()
                 .map(comment -> {
-                    UserDto user = getUserInfo(comment.getUserId());
+                    UserRankInfoDto user = userRestApi.userRankInfo(comment.getUserId());
                     return new CommentDto(
                             comment.getBattleCommentId(),
                             user.getImagePath(),

@@ -23,4 +23,9 @@ public class NickNameCheckResponseDto extends ResponseDto {
         ResponseDto responseBody = new ResponseDto(ResponseCode.DUPLICATE_NICKNAME, ResponseMessage.DUPLICATE_NICKNAME);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
     }
+
+    public static ResponseEntity<ResponseDto> invalidNickName() {
+        ResponseDto responseBody = new ResponseDto(ResponseCode.INVALID_NICKNAME, ResponseMessage.INVALID_NICKNAME);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseBody);
+    }
 }
