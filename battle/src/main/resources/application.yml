@@ -7,4 +7,4 @@ spring:
     active: ${setting.profile.type}
 
 server:
-  port: 8085
+  port: 8086
