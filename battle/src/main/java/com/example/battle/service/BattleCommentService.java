@@ -8,9 +8,7 @@ import com.example.battle.entity.BattleComment;
 import com.example.battle.mapper.BattleMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,8 +25,12 @@ public class BattleCommentService {
     private final BattleMapper battleMapper;
     private final UserRestApi userRestApi;
 
-    public Page<CommentDto> getComments(Long battleId, Pageable pageable) {
-        List<BattleComment> comments = battleMapper.getCommentsByBattleId(battleId, pageable);
+    public Slice<CommentDto> getComments(Long battleId, Pageable pageable) {
+        int offset = (int)pageable.getOffset();
+        int limit  = pageable.getPageSize();
+        int total = battleMapper.countCommentsByBattleId(battleId);
+
+        List<BattleComment> comments = battleMapper.getCommentsByBattleId(battleId, limit, offset);
         List<CommentDto> commentListDto = comments.stream()
                 .map(comment -> {
                     UserRankInfoDto user = userRestApi.userRankInfo(comment.getUserId());
@@ -41,8 +43,9 @@ public class BattleCommentService {
                     );
                 })
                 .collect(Collectors.toList());
-        int total = battleMapper.countCommentsByBattleId(battleId);
-        return new PageImpl<>(commentListDto, pageable, total);
+
+        boolean hasNext = offset + limit < total;
+        return new SliceImpl<>(commentListDto, pageable, hasNext);
     }
 
     public void addComment(Long battleId, Long userId, String comment) {

@@ -7,6 +7,9 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 @Log4j2
@@ -71,5 +74,15 @@ public class BattleVoteService {
                 log.info("vote2 증가. battleId: {}", battleId);
             }
         }
+    }
+
+    public Map<String, Boolean> getVoteState(Long battleId, Long userId) {
+        Long votePostId = battleMapper.getBattleVote(battleId, userId);
+        Battle battle = battleMapper.getBattleById(battleId);
+
+        Map<String, Boolean> voteState = new HashMap<>();
+        voteState.put("post1Vote", votePostId != null && votePostId.equals(battle.getPostId1()));
+        voteState.put("post2Vote", votePostId != null && votePostId.equals(battle.getPostId2()));
+        return voteState;
     }
 }

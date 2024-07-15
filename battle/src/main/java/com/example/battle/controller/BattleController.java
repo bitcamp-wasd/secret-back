@@ -2,6 +2,7 @@ package com.example.battle.controller;
 
 import com.example.battle.annotation.HeaderUserAuth;
 import com.example.battle.dto.BattleDto;
+import com.example.battle.dto.BattleRegisterDto;
 import com.example.battle.dto.CommentDto;
 import com.example.battle.dto.auth.UserAuth;
 import com.example.battle.service.BattleCommentService;
@@ -17,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,6 +28,14 @@ public class BattleController {
     private final BattleService battleService;
     private final BattleVoteService battleVoteService;
     private final BattleCommentService battleCommentService;
+
+    // 배틀 등록
+    @PostMapping("/auth/register")
+    public ResponseEntity<String> registerBattle(@HeaderUserAuth UserAuth userAuth,
+                                                 @RequestBody BattleRegisterDto battleRegisterDto) {
+        battleService.registerBattle(userAuth.getUserId(), battleRegisterDto);
+        return ResponseEntity.ok("success");
+    }
 
     // 배틀 게시글 조회
     @GetMapping("/{battleId}")
@@ -66,13 +76,20 @@ public class BattleController {
         return ResponseEntity.ok("Vote successful");
     }
 
+    @GetMapping("/auth/{battleId}/state")
+    public ResponseEntity<Map<String,Boolean>> getVoteState(@HeaderUserAuth UserAuth userAuth,
+                                                            @PathVariable Long battleId) {
+        Map<String, Boolean> voteState = battleVoteService.getVoteState(battleId, userAuth.getUserId());
+        return ResponseEntity.ok(voteState);
+    }
+
     // 댓글
     @GetMapping("/{battleId}/commentList")
-    public ResponseEntity<Page<CommentDto>> getComments(@PathVariable Long battleId,
+    public ResponseEntity<Slice<CommentDto>> getComments(@PathVariable Long battleId,
                                                         @RequestParam(defaultValue = "0") int pageNumber,
                                                         @RequestParam(defaultValue = "5") int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        Page<CommentDto> comments = battleCommentService.getComments(battleId, pageable);
+        Slice<CommentDto> comments = battleCommentService.getComments(battleId, pageable);
         return ResponseEntity.ok(comments);
     }
 
