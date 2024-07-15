@@ -2,6 +2,8 @@ package com.example.battle.annotation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -13,6 +15,7 @@ import java.util.Base64;
 
 @Component
 @RequiredArgsConstructor
+@Log4j2
 public class HeaderUserAuthArgumentResolver implements HandlerMethodArgumentResolver {
 
     private final ObjectMapper objectMapper;
@@ -20,7 +23,9 @@ public class HeaderUserAuthArgumentResolver implements HandlerMethodArgumentReso
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.hasParameterAnnotation(HeaderUserAuth.class);
+        boolean supports = parameter.hasParameterAnnotation(HeaderUserAuth.class);
+        log.info("supportsParameter called: {}", supports);
+        return supports;
     }
 
     @Override
@@ -29,13 +34,23 @@ public class HeaderUserAuthArgumentResolver implements HandlerMethodArgumentReso
 
         if(headerUserAuth != null) {
             String value = webRequest.getHeader(headerUserAuth.value());
+            log.info("Received header value: {}", value);
 
 
-            if(value != null) {
-                String decodeValue = new String(decoder.decode(value));
-                return objectMapper.readValue(decodeValue, parameter.getParameterType());
+            if (value != null) {
+                try {
+                    String decodeValue = new String(decoder.decode(value));
+                    log.info("Decoded header value: {}", decodeValue);
+                    return objectMapper.readValue(decodeValue, parameter.getParameterType());
+                } catch (Exception e) {
+                    log.error("Failed to decode and parse header value", e);
+                    throw e;
+                }
+            } else {
+                log.warn("Header value is null");
             }
         }
+
 
         return null;
     }

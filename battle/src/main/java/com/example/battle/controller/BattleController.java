@@ -10,7 +10,9 @@ import com.example.battle.service.BattleVoteService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,11 +35,33 @@ public class BattleController {
 
     }
 
+    // 배틀 리스트
+    @GetMapping("/list")
+    public ResponseEntity<Slice<BattleDto>> getBattleList(@RequestParam(defaultValue = "0") int pageNumber,
+                                                          @RequestParam(defaultValue = "10") int pageSize) {
+
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Slice<BattleDto> battles = battleService.getBattles("진행중", pageable);
+        return ResponseEntity.ok(battles);
+
+    }
+
+    // 내가 올린 배틀 리스트
+    @GetMapping("/auth/myBattle")
+    public ResponseEntity<Slice<BattleDto>> getMyBattleList(@HeaderUserAuth UserAuth userAuth,
+                                                            @RequestParam(defaultValue = "0") int pageNumber,
+                                                            @RequestParam(defaultValue = "10") int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Slice<BattleDto> battles = battleService.getUserBattles(userAuth.getUserId(), pageable);
+        return ResponseEntity.ok(battles);
+    }
+
     // 배틀 투표
-    @PostMapping("/{battleId}/vote")
+    @PostMapping("/auth/{battleId}/vote")
     public ResponseEntity<String> vote(@PathVariable Long battleId,
                                        @HeaderUserAuth UserAuth user,
                                        @RequestParam Long postId) {
+        log.info("Received request for voting. BattleId: {}, User: {}, PostId: {}", battleId, user, postId);
         battleVoteService.vote(battleId, user.getUserId(), postId);
         return ResponseEntity.ok("Vote successful");
     }
@@ -45,12 +69,14 @@ public class BattleController {
     // 댓글
     @GetMapping("/{battleId}/commentList")
     public ResponseEntity<Page<CommentDto>> getComments(@PathVariable Long battleId,
-                                                        Pageable pageable) {
+                                                        @RequestParam(defaultValue = "0") int pageNumber,
+                                                        @RequestParam(defaultValue = "5") int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
         Page<CommentDto> comments = battleCommentService.getComments(battleId, pageable);
         return ResponseEntity.ok(comments);
     }
 
-    @PostMapping("/{battleId}/comment")
+    @PostMapping("/auth/{battleId}/comment")
     public ResponseEntity<String> addComment(@PathVariable Long battleId,
                                              @HeaderUserAuth UserAuth user,
                                              @RequestBody CommentDto commentDto) {
@@ -59,7 +85,7 @@ public class BattleController {
     }
 
 
-    @PutMapping("/{battleId}/update/{battleCommentId}")
+    @PutMapping("/auth/{battleId}/update/{battleCommentId}")
     public ResponseEntity<String> updateComment(@PathVariable Long battleId,
                                                 @PathVariable Long battleCommentId,
                                                 @HeaderUserAuth UserAuth user,
@@ -68,7 +94,7 @@ public class BattleController {
         return ResponseEntity.ok("Comment Update successful");
     }
 
-    @DeleteMapping("/{battleId}/delete/{battleCommentId}")
+    @DeleteMapping("/auth/{battleId}/delete/{battleCommentId}")
     public ResponseEntity<String> deleteComment(@PathVariable Long battleId,
                                                 @PathVariable Long battleCommentId,
                                                 @HeaderUserAuth UserAuth user){

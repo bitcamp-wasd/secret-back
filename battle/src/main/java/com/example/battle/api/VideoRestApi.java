@@ -8,6 +8,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(name = "VideoRestApi", url = "${openfeign.url.video}")
 public interface VideoRestApi {
 
-    @GetMapping("info")
+    @GetMapping("/post/info")
     public PostInfoDto videoInfo(@RequestParam("postId") Long postId);
 }
