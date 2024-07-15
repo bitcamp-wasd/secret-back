@@ -1,10 +1,20 @@
-import { Module } from '@nestjs/common';
+import { Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { SpringCloudConfig } from './config/cloud.config';
+import { ConfigModule } from './module/config.module';
+
+import mongoose from 'mongoose';
+import { MongoModule } from './module/mongo.module';
+import { ChallengeModule } from './challenge/challenge.module';
 
 @Module({
-  imports: [],
+  imports: [ConfigModule, MongoModule, ChallengeModule],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, SpringCloudConfig],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(): any {
+    mongoose.set('debug', true);
+  }
+}
