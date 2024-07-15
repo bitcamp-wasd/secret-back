@@ -32,4 +32,10 @@ public class VideoService {
         return video.toVideoReponseDto(video, userInfoDto);
     }
 
+    public Long getPostId(Long videoId) {
+        Video video = videoRepository.findByIdFetch(videoId).orElseThrow(() -> new IllegalArgumentException("없는 비디오 입니다."));
+
+        Post post = video.getPost();
+        return post.getPostId();
+    }
 }
