@@ -4,6 +4,12 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.battle.mapper.BattleMapper">
 
+    <!--  배틀 등록하기 -->
+    <insert id="insertBattle" parameterType="map">
+        INSERT INTO battle (post_id1, post_id2, user_id, title, create_date, end_date, state, vote1_cnt, vote2_cnt, views)
+        VALUES (#{battle.postId1}, #{battle.postId2}, #{userId}, #{battle.title}, #{battle.createDate}, #{battle.endDate}, #{battle.state}, #{battle.vote1Cnt}, #{battle.vote2Cnt}, #{battle.views})
+    </insert>
+
     <!-- 배틀 정보 가져오기 -->
     <select id="getBattleById" resultType="com.example.battle.entity.Battle">
         SELECT battle_id AS battleId, post_id1 AS postId1, post_id2 AS postId2, user_id AS userId,
@@ -97,7 +103,7 @@
         SELECT * FROM battle_comment
         WHERE battle_id = #{battleId}
         ORDER BY create_date DESC
-        LIMIT #{pageable.offset}, #{pageable.pageSize}
+        LIMIT #{offset}, #{limit}
     </select>
 
     <!--배틀 게시판 리스트-->
@@ -137,37 +143,4 @@
         WHERE user_id = #{userId}
     </select>
 
-
-
-
-    <!--
-        배틀 등록하기
-        {
-            title,
-            url,
-            url
-        }
-        이렇게 입력하면 url 에서 postId 추출 후 해당 postId 저장
-    -->
-<!--    <insert id="insertBattle" useGeneratedKeys="true" keyProperty="battleId">-->
-<!--        INSERT INTO battle (post_id1, post_id2, user_id, title, create_date, end_date, state, vote1_cnt, vote2_cnt)-->
-<!--        VALUES (#{postId1}, #{postId2}, #{userId}, #{title}, #{createDate}, #{endDate}, #{state}, #{vote1Cnt}, #{vote2Cnt})-->
-<!--    </insert>-->
-
-    <!--
-        마이페이지 내가 등록한 배틀
-        무한 스크롤 slice
-    -->
-<!--    <select id="selectBattleByUserId" resultMap="BattleResultMap">-->
-<!--        SELECT b.*, v.*, c.*, p.title as postTitle1, p2.title as postTitle2, u.nickname-->
-<!--        FROM battle b-->
-<!--                 LEFT JOIN battle_vote_list v ON b.battle_id = v.battle_id-->
-<!--                 LEFT JOIN battle_comment c ON b.battle_id = c.battle_id-->
-<!--                 LEFT JOIN post p ON b.post_id1 = p.post_id-->
-<!--                 LEFT JOIN post p2 ON b.post_id2 = p2.post_id-->
-<!--                 LEFT JOIN user u ON b.user_id = u.user_id-->
-<!--        WHERE b.user_id = #{userId}-->
-<!--        ORDER BY b.create_date DESC-->
-<!--            LIMIT #{limit} OFFSET #{offset}-->
-<!--    </select>-->
 </mapper>

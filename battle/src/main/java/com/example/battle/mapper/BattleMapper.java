@@ -14,6 +14,10 @@ import java.util.List;
 @Mapper
 public interface BattleMapper {
 
+    //배틀 등록
+    void insertBattle(@Param("userId") Long userId,
+                      @Param("battle") Battle battle);
+
     // 내 배틀 게시글
     List<Battle> findByMyBattle(@Param("userId") Long userId,
                                 @Param("limit") int limit,
@@ -67,6 +71,7 @@ public interface BattleMapper {
     int countCommentsByBattleId(@Param("battleId") Long battleId);
 
     List<BattleComment> getCommentsByBattleId(@Param("battleId") Long battleId,
-                                              @Param("pageable") Pageable pageable);
+                                              @Param("limit") int limit,
+                                              @Param("offset") int offset);
 
 }
