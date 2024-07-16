@@ -3,6 +3,7 @@ package com.example.battle.dto;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -18,6 +19,6 @@ public class CommentDto {
     // userId에 저장되어있는 닉네임
     private String nickname;
 
-    private LocalDate createDate;
+    private LocalDateTime createDate;
     private String comment;
 }

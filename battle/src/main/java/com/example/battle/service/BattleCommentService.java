@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -55,6 +56,7 @@ public class BattleCommentService {
         battleComment.setBattle(battle);
         battleComment.setUserId(userId);
         battleComment.setComment(comment);
+        battleComment.setCreateDate(LocalDateTime.now());
         battleMapper.insertComment(battleComment);
     }
 

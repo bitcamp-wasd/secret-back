@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -59,8 +60,8 @@ public class BattleService {
         battle.setPostId2(postIdDto2.getPostId());
         battle.setTitle(battleRegisterDto.getTitle());
         battle.setUserId(userId);
-        battle.setCreateDate(LocalDate.now());
-        battle.setEndDate(LocalDate.now().plusWeeks(1));
+        battle.setCreateDate(LocalDateTime.now());
+        battle.setEndDate(LocalDateTime.now().plusWeeks(1));
         battle.setState("진행중");
         battle.setVote1Cnt(0);
         battle.setVote2Cnt(0);

@@ -85,7 +85,7 @@
 
     <update id="updateComment" parameterType="com.example.battle.entity.BattleComment">
         UPDATE battle_comment
-        SET comment = #{comment}, create_date = NOW()
+        SET comment = #{comment}
         WHERE battle_comment_id = #{battleCommentId}  AND user_id = #{userId} AND battle_id = #{battle.battleId}
     </update>
 
