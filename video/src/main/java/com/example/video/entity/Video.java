@@ -61,6 +61,7 @@ public class Video {
         return new VideoResponseDto(
                 video.getId(),
                 post.getThumbnailPath(),
+                video.getVideoPath(),
                 post.getTitle(),
                 post.getCategory().getCategory(),
                 userInfoDto.getNickname(),
