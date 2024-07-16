@@ -17,6 +17,7 @@ public class VideoResponseDto {
 
     private Long videoId;
     private String thumbnail;
+    private String video;
     private String title;
     private String category;
     private String nickname;

@@ -2,11 +2,9 @@ package com.example.video.controller;
 
 import com.example.video.dto.post.response.PostIdDto;
 import com.example.video.dto.post.response.VideoResponseDto;
-import com.example.video.entity.Video;
 import com.example.video.service.VideoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
