@@ -2,6 +2,7 @@ package com.example.video.entity;
 
 import com.example.video.dto.post.response.PostResponseDto;
 import com.example.video.dto.post.response.MyPostDto;
+import com.example.video.dto.post.response.UserInfoDto;
 import com.example.video.dto.post.response.VideoApiDto;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -112,6 +113,7 @@ public class Post {
     }
 
 
-
-
+    public UserInfoDto toUserInfoDto() {
+        return new UserInfoDto(this.userId);
+    }
 }

@@ -37,9 +37,7 @@ public class PostService {
 
     private final CategoryRepository categoryRepository;
     private final PostRepository postRepository;
-    private final VideoRepository videoRepository;
     private final SheetMusicRepository sheetMusicRepository;
-    private final VideoLikeListRepository videoLikeListRepository;
 
     private final AmazonS3 amazonS3;
 
@@ -224,5 +222,10 @@ public class PostService {
     public VideoApiDto getVideo(Long postId) {
         Post post = postRepository.findByIdFetchVideo(postId).orElseThrow(() -> new IllegalArgumentException("게시물이 존재하지 않습니다."));
         return post.toVideoApiDto();
+    }
+
+    public UserInfoDto getUserId(Long postId) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("게시물이 존재하지 않습니다."));
+        return post.toUserInfoDto();
     }
 }
