@@ -1,9 +1,10 @@
 package com.example.user.service;
 
-import com.example.user.component.DuplicateException;
-import com.example.user.component.PasswordFormatException;
-import com.example.user.dto.info.UpdateUserInfoDto;
-import com.example.user.dto.info.UserInfoDto;
+import com.example.user.common.ValidationUtil;
+import com.example.user.component.Exception.DuplicateException;
+import com.example.user.component.Exception.NicknameFormatException;
+import com.example.user.component.Exception.PasswordFormatException;
+import com.example.user.dto.info.*;
 import com.example.user.entity.UserEntity;
 import com.example.user.entity.UserRankEntity;
 import com.example.user.repository.UserRankRepository;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,6 +23,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserRankRepository userRankRepository;
+    private final ValidationUtil validationUtil;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     private boolean isValidPassword(String password) {
@@ -28,6 +31,7 @@ public class UserService {
         return password != null && password.matches(passwordPattern);
     }
 
+    @Transactional
     public void addUserPoints(Long userId, int points){
 
         UserEntity user = userRepository.findById(userId)
@@ -58,8 +62,13 @@ public class UserService {
         UserEntity userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
+        String nickname = dto.getNickName();
 
-        if (!userEntity.getNickname().equals(dto.getNickName())){
+        if (!validationUtil.isValidNickname(nickname)){
+            throw new NicknameFormatException("닉네임 형식에 맞춰주세요");
+        }
+
+        if (!userEntity.getNickname().equals(nickname)){
             boolean isExistNickName = userRepository.existsByNickname(dto.getNickName());
             if (isExistNickName){
                 throw new DuplicateException("Nickname already exists");
@@ -75,4 +84,40 @@ public class UserService {
         userEntity.setPassword(passwordEncoder.encode(password));
         userRepository.save(userEntity);
     }
+
+    public UserApiInfo getUserApiInfo(Long userId){
+
+        UserEntity userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        UserApiInfo userApiInfo = new UserApiInfo(
+                userEntity.getNickname(),
+                userEntity.getRankId().getRankName()
+        );
+        return userApiInfo;
+    }
+
+    public UserRankInfo getRankApiInfo(Long userId){
+
+        UserEntity userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        UserRankInfo userRankInfo = new UserRankInfo(
+                userEntity.getNickname(),
+                userEntity.getRankId().getImagePath()
+        );
+        return userRankInfo;
+    }
+
+//    public UserPointInfo getPointApiInfo(Long userId){
+//
+//        UserEntity userEntity = userRepository.findById(userId)
+//                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+//
+//        UserPointInfo userPointInfo = new UserPointInfo(
+//                userEntity.getPoint()
+//        );
+//        return userPointInfo;
+//    }
+
 }

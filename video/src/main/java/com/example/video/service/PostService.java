@@ -7,8 +7,8 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.example.video.dto.auth.UserAuth;
 import com.example.video.dto.post.request.PostRegisterDto;
-import com.example.video.dto.post.response.PostRegisterResponseDto;
-import com.example.video.dto.post.response.MyPostDto;
+import com.example.video.dto.post.request.PostSortDto;
+import com.example.video.dto.post.response.*;
 import com.example.video.entity.Category;
 import com.example.video.entity.Post;
 import com.example.video.entity.SheetMusic;
@@ -37,9 +37,7 @@ public class PostService {
 
     private final CategoryRepository categoryRepository;
     private final PostRepository postRepository;
-    private final VideoRepository videoRepository;
     private final SheetMusicRepository sheetMusicRepository;
-    private final VideoLikeListRepository videoLikeListRepository;
 
     private final AmazonS3 amazonS3;
 
@@ -168,9 +166,33 @@ public class PostService {
      * @param pageable
      * @return
      */
-    public Slice<Post> getPostList(Pageable pageable) {
+    public Slice<Post> getPostList(List<String> categories, Pageable pageable) {
 
-        return postRepository.findAll(pageable);
+        if(categories.size() == 0)
+            return postRepository.findAllFetch(pageable).orElse(null);
+
+        return postRepository.findAllFetch(categories, pageable).orElse(null);
+    }
+
+    /**
+     * 검색 결과
+     * @param search
+     * @param categories
+     * @param pageable
+     * @return
+     */
+    public List<PostResponseDto> searchPostList(String search, List<String> categories, Pageable pageable) {
+
+        if(categories.size() == 0)
+            return postRepository.findByTitle(search, pageable).orElseThrow(() -> new IllegalArgumentException("검색 결과가 없습니다."))
+                    .stream()
+                    .map(Post::toPostResponseDto)
+                    .toList();
+        
+        return postRepository.findByTitle(search, categories ,pageable).orElseThrow(() -> new IllegalArgumentException("검색 결과가 없습니다."))
+                .stream()
+                .map(Post::toPostResponseDto)
+                .toList();
     }
 
     /**
@@ -196,4 +218,14 @@ public class PostService {
         return myPosts;
     }
 
+
+    public VideoApiDto getVideo(Long postId) {
+        Post post = postRepository.findByIdFetchVideo(postId).orElseThrow(() -> new IllegalArgumentException("게시물이 존재하지 않습니다."));
+        return post.toVideoApiDto();
+    }
+
+    public UserInfoDto getUserId(Long postId) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("게시물이 존재하지 않습니다."));
+        return post.toUserInfoDto();
+    }
 }

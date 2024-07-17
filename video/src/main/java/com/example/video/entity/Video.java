@@ -1,5 +1,8 @@
 package com.example.video.entity;
 
+import com.example.video.dto.post.response.VideoApiDto;
+import com.example.video.dto.post.response.VideoResponseDto;
+import com.example.video.dto.user.response.UserInfoDto;
 import com.example.video.entity.state.VideoState;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -8,6 +11,7 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -51,10 +55,32 @@ public class Video {
         this.state = VideoState.UPLOADING;
     }
 
+    public static VideoResponseDto toVideoReponseDto(Video video, UserInfoDto userInfoDto) {
+        Post post = video.getPost();
+
+        return new VideoResponseDto(
+                video.getId(),
+                post.getThumbnailPath(),
+                video.getVideoPath(),
+                post.getTitle(),
+                post.getCategory().getCategory(),
+                userInfoDto.getNickname(),
+                userInfoDto.getRankName(),
+                video.getLikeCount(),
+                post.getViews(),
+                post.getUploadDate(),
+                video.getDescription(),
+                video.getSheetMusicList().stream().map((s) -> s.getPath()).toList(),
+                video.getCommentCount()
+        );
+    }
+
+
+
+    // 좋아요 수
     public void plusLikeCount() {
         this.likeCount += 1;
     }
-
     public void minusLikeCount() {
         this.likeCount -= 1;
     }

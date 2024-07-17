@@ -2,9 +2,12 @@ package com.example.video.entity;
 
 import com.example.video.dto.post.response.PostResponseDto;
 import com.example.video.dto.post.response.MyPostDto;
+import com.example.video.dto.post.response.UserInfoDto;
+import com.example.video.dto.post.response.VideoApiDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
@@ -71,7 +74,8 @@ public class Post {
                 views,
                 uploadDate,
                 video.getLength(),
-                userNickname
+                userNickname,
+                category.getCategory()
         );
     }
 
@@ -89,7 +93,27 @@ public class Post {
         );
     }
 
+    public VideoApiDto toVideoApiDto() {
+        return new VideoApiDto(
+                this.getVideo().getId(),
+                this.getTitle(),
+                this.getThumbnailPath(),
+                this.getUserNickname(),
+                this.getViews(),
+                this.getUploadDate(),
+                this.video.getLength()
+        );
+    }
+
+    /**
+     * 조회수 증가
+     */
+    public void plusViews() {
+        this.views += 1;
+    }
 
 
-
+    public UserInfoDto toUserInfoDto() {
+        return new UserInfoDto(this.userId);
+    }
 }
