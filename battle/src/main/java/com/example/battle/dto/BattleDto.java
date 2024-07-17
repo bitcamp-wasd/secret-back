@@ -4,6 +4,7 @@ import com.example.battle.dto.post.response.PostInfoDto;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -18,7 +19,7 @@ public class BattleDto {
 
 //    private Long views;
 
-    private LocalDate endDate;
+    private LocalDateTime endDate;
     private Long vote1Cnt;
     private Long vote2Cnt;
 

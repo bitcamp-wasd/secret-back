@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -32,10 +33,10 @@ public class Battle {
     private String title;
 
     @Column(name = "create_date")
-    private LocalDate createDate = LocalDate.now();
+    private LocalDateTime createDate = LocalDateTime.now();
 
     @Column(name = "end_date")
-    private LocalDate endDate = LocalDate.now().plusWeeks(1);
+    private LocalDateTime endDate = LocalDateTime.now().plusWeeks(1);
 
     private String state = "진행중";
 

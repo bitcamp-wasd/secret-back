@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -20,7 +21,7 @@ public class BattleComment {
     private Long battleCommentId;
 
     @Column(name = "create_date")
-    private LocalDate createDate=LocalDate.now();
+    private LocalDateTime createDate=LocalDateTime.now();
 
     // api 적용시 조인 제거
     @Column(name = "user_id")
