@@ -9,10 +9,15 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
 public interface BattleMapper {
+
+    List<Battle> findEndBattles(@Param("currentDate")LocalDateTime currentDate);
+
+    void updateBattleState(@Param("battleId") Long battleId, @Param("state") String state);
 
     //배틀 등록
     void insertBattle(@Param("userId") Long userId,
@@ -35,6 +40,11 @@ public interface BattleMapper {
                                    @Param("offset") int offset);
 
     int countByState(@Param("state") String state);
+
+    // 배틀 게시판 삭제 시 관련 데이터 삭제
+    void deleteCommentsByBattleId(@Param("battleId") Long battleId);
+    void deleteVotesByBattleId(@Param("battleId") Long battleId);
+    void deleteBattleByBattleId(@Param("battleId") Long battleId);
 
     // 투표
     void insertBattleVote(@Param("battleId") Long battleId,

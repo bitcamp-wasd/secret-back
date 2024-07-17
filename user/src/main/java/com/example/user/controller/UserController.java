@@ -71,4 +71,20 @@ public class UserController {
         return ResponseEntity.ok(userRankInfo);
     }
 
+//    @GetMapping("pointInfo")
+//    public ResponseEntity<UserPointInfo> getPointApiInfo(@RequestParam("userId") Long userId)
+//        throws JsonProcessingException {
+//
+//        UserPointInfo userPointInfo = userService.getPointApiInfo(userId);
+//        return ResponseEntity.ok(userPointInfo);
+//    }
+
+    @PutMapping("pointInfo")
+    public ResponseEntity<Void> addUserPoints(@RequestParam("userId") Long userId,
+                                              @RequestParam("point") int point)
+            throws JsonProcessingException {
+        userService.addUserPoints(userId, point);
+        return ResponseEntity.ok().build();
+    }
+
 }

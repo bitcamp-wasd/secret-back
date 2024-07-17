@@ -56,6 +56,14 @@ public class BattleController {
 
     }
 
+    // 배틀 게시판 삭제
+    @DeleteMapping("/auth/{battleId}/delete")
+    public ResponseEntity<String> deleteBattle(@PathVariable Long battleId,
+                                               @HeaderUserAuth UserAuth userAuth) {
+        battleService.deleteBattle(battleId, userAuth.getUserId());
+        return ResponseEntity.ok("success");
+    }
+
     // 내가 올린 배틀 리스트
     @GetMapping("/auth/myBattle")
     public ResponseEntity<Slice<BattleDto>> getMyBattleList(@HeaderUserAuth UserAuth userAuth,

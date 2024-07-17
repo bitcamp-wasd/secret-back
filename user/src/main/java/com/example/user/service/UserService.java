@@ -4,10 +4,7 @@ import com.example.user.common.ValidationUtil;
 import com.example.user.component.Exception.DuplicateException;
 import com.example.user.component.Exception.NicknameFormatException;
 import com.example.user.component.Exception.PasswordFormatException;
-import com.example.user.dto.info.UpdateUserInfoDto;
-import com.example.user.dto.info.UserApiInfo;
-import com.example.user.dto.info.UserInfoDto;
-import com.example.user.dto.info.UserRankInfo;
+import com.example.user.dto.info.*;
 import com.example.user.entity.UserEntity;
 import com.example.user.entity.UserRankEntity;
 import com.example.user.repository.UserRankRepository;
@@ -16,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -33,6 +31,7 @@ public class UserService {
         return password != null && password.matches(passwordPattern);
     }
 
+    @Transactional
     public void addUserPoints(Long userId, int points){
 
         UserEntity user = userRepository.findById(userId)
@@ -109,4 +108,16 @@ public class UserService {
         );
         return userRankInfo;
     }
+
+//    public UserPointInfo getPointApiInfo(Long userId){
+//
+//        UserEntity userEntity = userRepository.findById(userId)
+//                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+//
+//        UserPointInfo userPointInfo = new UserPointInfo(
+//                userEntity.getPoint()
+//        );
+//        return userPointInfo;
+//    }
+
 }
