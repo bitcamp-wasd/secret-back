@@ -6,14 +6,18 @@ import com.example.battle.dto.BattleDto;
 import com.example.battle.dto.BattleRegisterDto;
 import com.example.battle.dto.post.response.PostIdDto;
 import com.example.battle.dto.post.response.PostInfoDto;
+import com.example.battle.dto.post.response.PostUserIdDto;
 import com.example.battle.entity.Battle;
+import com.example.battle.entity.BattleVoteList;
 import com.example.battle.mapper.BattleMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -43,6 +47,50 @@ public class BattleService {
             e.printStackTrace();
             return null;
         }
+    }
+
+    @Scheduled(fixedRate = 60000) // 임시 1분마다 실행
+    @Transactional
+    public void checkEndBattles(){
+        LocalDateTime currentDate = LocalDateTime.now();
+        List<Battle> endedBattles = battleMapper.findEndBattles(currentDate);
+        for (Battle battle : endedBattles) {
+            endBattle(battle.getBattleId());
+        }
+    }
+
+    @Transactional
+    public void endBattle(Long battleId){
+        Battle battle = battleMapper.getBattleById(battleId);
+        if(battle == null){
+            throw new IllegalArgumentException("Battle not found");
+        }
+
+        Long postId1 = battle.getPostId1();
+        Long postId2 = battle.getPostId2();
+
+        int vote1Cnt = battle.getVote1Cnt();
+        int vote2Cnt = battle.getVote2Cnt();
+
+        if (vote1Cnt == vote2Cnt){
+
+            PostUserIdDto postUserId1 = videoRestApi.postUserIdInfo(postId1);
+            Long userId1 = postUserId1.getUserId();
+            userRestApi.addUserPoints(userId1,100);
+
+            PostUserIdDto postUserId2 = videoRestApi.postUserIdInfo(postId2);
+            Long userId2 = postUserId2.getUserId();
+            userRestApi.addUserPoints(userId2,100);
+        } else {
+
+            Long winPostId = vote1Cnt > vote2Cnt ? postId1 : postId2;
+            PostUserIdDto postUserId = videoRestApi.postUserIdInfo(winPostId);
+            Long winUserId = postUserId.getUserId();
+            userRestApi.addUserPoints(winUserId, 200);
+        }
+
+        battleMapper.updateBattleState(battleId, "종료");
+
     }
 
 
@@ -170,6 +218,21 @@ public class BattleService {
         boolean hasNext = offset + limit < total;
 
         return new SliceImpl<>(battleDtos, pageable, hasNext);
+    }
+
+    public void deleteBattle(Long battleId, Long userId) {
+        Battle battle = battleMapper.getBattleById(battleId);
+        if (battle == null) {
+            throw new IllegalArgumentException("Battle not found");
+        }
+
+        if (!battle.getUserId().equals(userId)) {
+            throw new IllegalArgumentException("Battle user does not match");
+        }
+
+        battleMapper.deleteCommentsByBattleId(battleId);
+        battleMapper.deleteVotesByBattleId(battleId);
+        battleMapper.deleteBattleByBattleId(battleId);
     }
 
 }

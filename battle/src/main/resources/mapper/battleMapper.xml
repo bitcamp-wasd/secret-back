@@ -4,6 +4,17 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.battle.mapper.BattleMapper">
 
+    <!-- 종료된 배틀 찾기 -->
+    <select id="findEndBattles" parameterType="map" resultMap="BattleResultMap">
+        SELECT * FROM battle
+        WHERE end_date <![CDATA[<=]]> #{currentDate} AND state = '진행중'
+    </select>
+
+    <update id="updateBattleState">
+        UPDATE battle SET state = #{state}
+        WHERE battle_id = #{battleId}
+    </update>
+
     <!--  배틀 등록하기 -->
     <insert id="insertBattle" parameterType="map">
         INSERT INTO battle (post_id1, post_id2, user_id, title, create_date, end_date, state, vote1_cnt, vote2_cnt, views)
@@ -21,8 +32,22 @@
     <!--배틀 조회수 증가-->
     <update id="incrementViews">
         UPDATE battle SET views = views +1
-        WHERE battle_id  = #{battleId}
+        WHERE battle_id = #{battleId}
     </update>
+    
+    <!-- 배틀 게시판 삭제 시 관련 데이터 삭제 -->
+    <delete id="deleteCommentsByBattleId">
+        DELETE FROM battle_comment
+        WHERE battle_id = #{battleId}
+    </delete>
+    <delete id="deleteVotesByBattleId">
+        DELETE FROM battle_vote_list
+        WHERE battle_id = #{battleId}
+    </delete>
+    <delete id="deleteBattleByBattleId">
+        DELETE FROM battle
+        WHERE battle_id = #{battleId}
+    </delete>
 
     <!-- 배틀 투표 -->
     <insert id="insertBattleVote">
