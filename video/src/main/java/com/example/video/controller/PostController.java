@@ -100,4 +100,10 @@ public class PostController {
         VideoApiDto videoApiDto = postService.getVideo(postId);
         return ResponseEntity.ok(videoApiDto);
     };
+
+    @GetMapping("userinfo")
+    public ResponseEntity<UserInfoDto> getUserId(@RequestParam("postId") Long postId) {
+        UserInfoDto userInfo = postService.getUserId(postId);
+        return ResponseEntity.ok(userInfo);
+    }
 }
