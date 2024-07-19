@@ -16,8 +16,8 @@ public class BattleDto {
     private Long battleId;
     private String title;
     private Long views;
-
-//    private Long views;
+    
+    private Long userId;
 
     private LocalDateTime endDate;
     private Long vote1Cnt;
