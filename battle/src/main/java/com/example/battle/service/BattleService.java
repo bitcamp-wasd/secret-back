@@ -131,6 +131,7 @@ public class BattleService {
         battleDto.setBattleId(battle.getBattleId());
         battleDto.setTitle(battle.getTitle());
         battleDto.setViews((long) battle.getViews());
+        battleDto.setUserId(battle.getUserId());
         battleDto.setEndDate(battle.getEndDate());
         battleDto.setVote1Cnt((long) battle.getVote1Cnt());
         battleDto.setVote2Cnt((long) battle.getVote2Cnt());
