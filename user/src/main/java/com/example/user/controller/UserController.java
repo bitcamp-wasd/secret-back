@@ -8,8 +8,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.apache.catalina.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -54,6 +60,25 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    // 마이페이지 댓글 리스트
+    @GetMapping("/auth/myComments")
+    public ResponseEntity<Page<Object>> getMyComments(@HeaderUserAuth UserAuth userAuth,
+                                                      @RequestParam(defaultValue = "0") int pageNumber,
+                                                      @RequestParam(defaultValue = "10") int pageSize)
+            throws JsonProcessingException {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Page<Object> comments = userService.getMyComments(userAuth.getUserId(), pageable);
+        return ResponseEntity.ok(comments);
+    }
+
+    // 마이페이지 댓글 리스트 삭제
+    @DeleteMapping("/auth/myComments")
+    public ResponseEntity<Void> deleteComments(@HeaderUserAuth UserAuth userAuth,
+                                               @RequestParam List<Long> battleCommentIds){
+        userService.deleteComments(userAuth.getUserId(), battleCommentIds);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("info")
     public ResponseEntity<UserApiInfo> getUserApiInfo(@RequestParam("userId") Long userId)
             throws JsonProcessingException {
@@ -70,14 +95,6 @@ public class UserController {
         UserRankInfo userRankInfo = userService.getRankApiInfo(userId);
         return ResponseEntity.ok(userRankInfo);
     }
-
-//    @GetMapping("pointInfo")
-//    public ResponseEntity<UserPointInfo> getPointApiInfo(@RequestParam("userId") Long userId)
-//        throws JsonProcessingException {
-//
-//        UserPointInfo userPointInfo = userService.getPointApiInfo(userId);
-//        return ResponseEntity.ok(userPointInfo);
-//    }
 
     @PutMapping("pointInfo")
     public ResponseEntity<Void> addUserPoints(@RequestParam("userId") Long userId,
