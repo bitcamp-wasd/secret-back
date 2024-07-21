@@ -5,12 +5,12 @@ import com.example.battle.dto.BattleDto;
 import com.example.battle.dto.BattleRegisterDto;
 import com.example.battle.dto.CommentDto;
 import com.example.battle.dto.auth.UserAuth;
+import com.example.battle.dto.response.BattleMyCommentDto;
 import com.example.battle.service.BattleCommentService;
 import com.example.battle.service.BattleService;
 import com.example.battle.service.BattleVoteService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -131,4 +131,20 @@ public class BattleController {
     public ResponseEntity<Integer> getCommentCountByBattleId(@PathVariable Long battleId) {
         return ResponseEntity.ok(battleCommentService.getCommentCountByBattleId(battleId));
     }
+
+    // FeignClient 내가 쓴 배틀 댓글
+    @GetMapping("myComment")
+    public ResponseEntity<List<BattleMyCommentDto>> getCommentsByUserId(@RequestParam Long userId) {
+        List<BattleMyCommentDto> comments = battleCommentService.getCommentsByUserId(userId);
+        return ResponseEntity.ok(comments);
+    }
+
+    // FeignClient 내가 쓴 배틀 댓글 여러개 삭제
+    @DeleteMapping("myComments")
+    public ResponseEntity<Void> deleteBattleComments(@RequestParam Long userId,
+                                                     @RequestParam List<Long> battleCommentIds) {
+        battleCommentService.deleteBattleComments(userId, battleCommentIds);
+        return ResponseEntity.ok().build();
+    }
+
 }

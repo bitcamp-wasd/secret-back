@@ -131,6 +131,29 @@
         LIMIT #{offset}, #{limit}
     </select>
 
+    <!-- 마이페이지 댓글 게시판-->
+    <resultMap id="BattleMyCommentResultMap" type="com.example.battle.dto.response.BattleMyCommentDto">
+        <id property="battleCommentId" column="battle_comment_id"/>
+        <result property="comment" column="comment"/>
+        <result property="createDate" column="create_date"/>
+        <result property="battleId" column="battle_id"/>
+    </resultMap>
+
+    <select id="findCommentsByUserId" resultMap="BattleMyCommentResultMap">
+        SELECT battle_comment_id, comment, create_date, battle_id
+        FROM battle_comment
+        WHERE user_id = #{userId}
+    </select>
+
+    <delete id="deleteBattleComments">
+        DELETE FROM battle_comment WHERE user_id = #{userId} AND battle_comment_id IN
+        <foreach item="id" collection="battleCommentIds"
+                 open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+
     <!--배틀 게시판 리스트-->
     <resultMap id="BattleResultMap" type="com.example.battle.entity.Battle">
         <id property="battleId" column="battle_id" />

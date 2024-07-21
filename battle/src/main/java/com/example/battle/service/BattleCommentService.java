@@ -2,6 +2,7 @@ package com.example.battle.service;
 
 import com.example.battle.api.UserRestApi;
 import com.example.battle.dto.CommentDto;
+import com.example.battle.dto.response.BattleMyCommentDto;
 import com.example.battle.dto.user.response.UserRankInfoDto;
 import com.example.battle.entity.Battle;
 import com.example.battle.entity.BattleComment;
@@ -12,10 +13,8 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,6 +46,16 @@ public class BattleCommentService {
 
         boolean hasNext = offset + limit < total;
         return new SliceImpl<>(commentListDto, pageable, hasNext);
+    }
+
+    // 배틀에서 내가 쓴 댓글 리스트
+    public List<BattleMyCommentDto> getCommentsByUserId(Long userId) {
+        return battleMapper.findCommentsByUserId(userId);
+    }
+
+    @Transactional
+    public void deleteBattleComments(Long userId, List<Long> battleCommentIds) {
+        battleMapper.deleteBattleComments(userId, battleCommentIds);
     }
 
     public void addComment(Long battleId, Long userId, String comment) {

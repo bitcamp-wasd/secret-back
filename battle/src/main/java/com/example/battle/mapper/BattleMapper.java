@@ -1,13 +1,10 @@
 package com.example.battle.mapper;
 
-import com.example.battle.dto.BattleDto;
-import com.example.battle.dto.CommentDto;
+import com.example.battle.dto.response.BattleMyCommentDto;
 import com.example.battle.entity.Battle;
 import com.example.battle.entity.BattleComment;
-import com.example.battle.entity.BattleVoteList;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -70,6 +67,11 @@ public interface BattleMapper {
     void decrementVote2Cnt(@Param("battleId") Long battleId);
 
     // 댓글
+    List<BattleMyCommentDto> findCommentsByUserId(@Param("userId") Long userId);
+
+    void deleteBattleComments(@Param("userId") Long userId,
+                              @Param("battleCommentIds") List<Long> battleCommentIds);
+
     void insertComment(BattleComment battleComment);
 
     void updateComment(BattleComment battleComment);
