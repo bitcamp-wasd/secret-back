@@ -12,12 +12,14 @@ export const configProviders = [
         label: 'main',
       };
 
+      console.log('config provider');
       try {
         const config: Config = await SpringConfigClient.load(
           configOptions,
         ).then((configYaml) => {
           return configYaml;
         });
+
         return config;
       } catch (error) {
         console.error(error);

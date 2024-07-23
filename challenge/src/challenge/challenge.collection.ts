@@ -1,9 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { IsEnum } from 'class-validator';
-import { now, Types } from 'mongoose';
-import { ChallengeList } from 'src/challengeList/challengeList.collection';
+
 import { State } from './state.enum';
 import * as mongoosePaginate from 'mongoose-paginate-v2';
+import { Types } from 'mongoose';
 
 @Schema({ timestamps: true, collection: 'challenge' })
 export class Challenge {
@@ -13,25 +13,26 @@ export class Challenge {
   @Prop()
   numberOfPeople: number;
 
-  @Prop({ default: now() })
-  createDate: Date;
-
   @Prop()
   endDate: Date;
 
   @Prop()
   voteEndDate: Date;
 
-  @Prop()
+  @Prop({ default: 0 })
   count: number;
+
+  @Prop({ default: 0 })
+  recruited: number;
 
   @Prop({ type: String, enum: State, default: State.RECRUITMENT })
   @IsEnum(State)
   state: State;
 
-  @Prop({ default: [], type: Types.ObjectId, ref: 'ChallengeList' })
-  challengeList: ChallengeList[];
+  @Prop({ default: [], type: [{ type: Types.ObjectId }], ref: 'ChallengeList' })
+  challengeList: Types.ObjectId[];
 }
 
-export const ChallengeSchema = SchemaFactory.createForClass(Challenge);
-ChallengeSchema.plugin(mongoosePaginate);
+const schema = SchemaFactory.createForClass(Challenge);
+schema.plugin(mongoosePaginate);
+export const ChallengeSchema = schema;

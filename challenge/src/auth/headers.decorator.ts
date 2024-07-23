@@ -13,8 +13,6 @@ export const UserAuth = createParamDecorator(
       ),
     );
 
-    console.log(userAuth);
-    console.log(userAuth instanceof UserAuthDto);
     return userAuth;
   },
 );

@@ -3,7 +3,9 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 @Schema({ collection: 'challengeList' })
 export class ChallengeList {
   @Prop()
-  postId: number;
+  videoPath: string;
+  @Prop()
+  thumbnailPath: string;
   @Prop()
   userId: number;
   @Prop()

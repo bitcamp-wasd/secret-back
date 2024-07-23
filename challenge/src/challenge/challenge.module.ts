@@ -10,5 +10,6 @@ import { ChallengeService } from './challenge.service';
   ],
   controllers: [ChallengeController],
   providers: [ChallengeService],
+  exports: [ChallengeService],
 })
 export class ChallengeModule {}
