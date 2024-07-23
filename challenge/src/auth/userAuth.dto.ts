@@ -1,8 +1,8 @@
-import { IsString } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 
 export class UserAuthDto {
-  @IsString()
-  name: string;
+  @IsNumber()
+  userId: number;
   @IsString()
   role: string;
   @IsString()

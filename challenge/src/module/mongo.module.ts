@@ -6,7 +6,7 @@ import { SpringCloudConfig } from 'src/config/cloud.config';
   imports: [
     MongooseModule.forRootAsync({
       useFactory: async (springCloudConfig: SpringCloudConfig) => ({
-        uri: await springCloudConfig.get('mongo.uri'),
+        uri: springCloudConfig.get('mongo.uri'),
       }),
       inject: [SpringCloudConfig],
     }),

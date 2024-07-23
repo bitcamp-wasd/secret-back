@@ -13,7 +13,6 @@ export class SpringCloudConfig {
   get(variable: string): string {
     const value: string = this.config.get(variable);
 
-    this.logger.debug(variable + ': ' + value);
     return value;
   }
 }
