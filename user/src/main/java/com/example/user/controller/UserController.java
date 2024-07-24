@@ -3,12 +3,15 @@ package com.example.user.controller;
 import com.example.user.annotation.HeaderUserAuth;
 import com.example.user.common.ParseUtil;
 import com.example.user.dto.info.*;
+import com.example.user.dto.info.request.UserIdRequestDto;
+import com.example.user.dto.info.response.UserApiInfo;
+import com.example.user.dto.info.response.UserListDto;
+import com.example.user.dto.info.response.UserRankInfo;
 import com.example.user.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.apache.catalina.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -46,9 +49,6 @@ public class UserController {
         UserInfoDto userInfo = userService.getUserInfo(userId);
         return ResponseEntity.ok(userInfo);
     }
-
-    // 유저정보 가져오기
-
 
     // 유저 정보 수정
     @PutMapping("/auth/editinfo")
@@ -102,6 +102,13 @@ public class UserController {
             throws JsonProcessingException {
         userService.addUserPoints(userId, point);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("listInfo")
+    public ResponseEntity<List<UserListDto>> getUserList(@RequestBody UserIdRequestDto request){
+        List<Long> userId = request.getUserId();
+        List<UserListDto> userList = userService.getUserList(userId);
+        return ResponseEntity.ok(userList);
     }
 
 }
