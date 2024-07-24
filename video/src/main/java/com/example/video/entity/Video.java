@@ -1,7 +1,6 @@
 package com.example.video.entity;
 
-import com.example.video.dto.post.response.VideoApiDto;
-import com.example.video.dto.post.response.VideoResponseDto;
+import com.example.video.dto.video.response.VideoResponseDto;
 import com.example.video.dto.user.response.UserInfoDto;
 import com.example.video.entity.state.VideoState;
 import jakarta.persistence.*;
@@ -11,7 +10,6 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -42,7 +40,7 @@ public class Video {
     private VideoState state;
 
 
-    @OneToMany(mappedBy = "video", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "video", cascade = CascadeType.ALL, orphanRemoval = true)
     List<SheetMusic> sheetMusicList;
 
     @OneToOne(mappedBy = "video", fetch = FetchType.LAZY)
@@ -75,7 +73,22 @@ public class Video {
         );
     }
 
+    public void updateVideo(Category category, String description, String title) {
+        this.post.updateTitle(title);
+        this.post.updateCategory(category);
+        this.updateDescription(description);
+    }
 
+    public void updateSheetMusic(List<SheetMusic> sheetMusicList) {
+        this.sheetMusicList.clear();
+        sheetMusicList.stream().forEach((sheetMusic) -> {
+            this.sheetMusicList.add(sheetMusic);
+        });
+    }
+
+    public void updateDescription(String description) {
+        this.description = description;
+    }
 
     // 좋아요 수
     public void plusLikeCount() {
