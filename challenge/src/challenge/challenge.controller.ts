@@ -59,4 +59,11 @@ export class ChallengeController {
       throw error;
     }
   }
+
+  @Get('view')
+  async getChallenge(@Query('challengeId') challengeId: string) {
+    return await this.challengeService.getChallengeAndChallengeVideo(
+      challengeId,
+    );
+  }
 }

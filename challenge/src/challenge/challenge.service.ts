@@ -17,6 +17,73 @@ export class ChallengeService {
     private paginateChallengeModel: PaginateModel<Challenge>,
   ) {}
 
+  /**
+   * 투표 종료 및 정산
+   */
+  async endChallenge() {
+    const challenges: any = await this.challengeModel
+      .find({
+        state: State.VOTE,
+      })
+      .populate('challengeList')
+      .exec();
+
+    this.logger.debug(challenges);
+    challenges.forEach((challenge) => {
+      this.logger.debug(challenge.challengeList);
+      this.logger.debug(typeof challenge.ChallengeList);
+
+      if (challenge.voteEndDate >= new Date()) return;
+
+      challenge.state = State.COMPLETE;
+      challenge.save();
+      const challengeList: any = Array(challenge.challengeList).sort(
+        (a, b) => b.cnt - a.cnt,
+      );
+      this.logger.debug(challenge.challengeList);
+      this.logger.debug(challengeList);
+      const ranking = new Map();
+
+      for (let i = 0; i < challengeList.length; i++) {
+        let rank = 1;
+        let cnt = 0;
+        if (!ranking.has(rank)) ranking.set(rank, []);
+
+        if (i !== 0 || challengeList[i].cnt === challengeList[i - 1].cnt) {
+          if (cnt >= 3) break;
+          ranking.get(rank).push(challengeList[i]);
+          cnt += 1;
+        } else {
+          ranking.get(rank).push(challengeList[i]);
+          rank += 1;
+          cnt += 1;
+        }
+
+        this.logger.debug(ranking);
+      }
+    });
+  }
+
+  /**
+   * 투표 시작 상태 변환
+   */
+  async startVoteChallenge() {
+    const challenges = await this.challengeModel.find({
+      state: [State.RECRUITMENT, State.RECRUITMENT_COMPLETE],
+    });
+
+    challenges.forEach((challenge) => {
+      if (challenge.endDate >= new Date()) return;
+      challenge.state = State.VOTE;
+      challenge.save();
+    });
+  }
+
+  /**
+   * 새로운 챌린지 생성
+   * @param data
+   * @returns
+   */
   async newChallenge(data: NewChallengeRequestDto): Promise<Types.ObjectId> {
     const newChallenge: Challenge = new this.challengeModel({
       title: data.title,
@@ -33,6 +100,11 @@ export class ChallengeService {
     return _id;
   }
 
+  /**
+   * 챌린지 정보 가져오기
+   * @param pageNumber
+   * @returns
+   */
   async challengeList(pageNumber: number) {
     this.logger.debug(
       await this.challengeModel.find({}).populate('challengeList'),
@@ -118,5 +190,11 @@ export class ChallengeService {
       .findById(challengeId)
       .populate('challengeList')
       .exec();
+  }
+
+  async checkState(challengeId: string, state: State, errorMessage) {
+    const challenge = await this.challengeModel.findById(challengeId);
+
+    if (challenge.state !== state) throw errorMessage;
   }
 }
