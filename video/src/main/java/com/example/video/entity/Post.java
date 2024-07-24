@@ -51,7 +51,7 @@ public class Post {
     private Long views;
 
 
-    @OneToMany
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostComment> postComment;
 
 
@@ -115,5 +115,17 @@ public class Post {
 
     public UserInfoDto toUserInfoDto() {
         return new UserInfoDto(this.userId);
+    }
+
+    public void updateThumbnailPath(String thumbnailPath) {
+        this.thumbnailPath = thumbnailPath;
+    }
+
+    public void updateTitle(String title) {
+        this.title = title;
+    }
+
+    public void updateCategory(Category category) {
+        this.category = category;
     }
 }

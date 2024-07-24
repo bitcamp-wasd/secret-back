@@ -1,12 +1,16 @@
 package com.example.video.service;
 
 import com.example.video.dto.auth.UserAuth;
+import com.example.video.dto.post.response.PostResponseDto;
 import com.example.video.entity.Video;
 import com.example.video.entity.VideoLikeList;
 import com.example.video.repository.VideoLikeListRepository;
 import com.example.video.repository.VideoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -55,4 +59,9 @@ public class VideoLikeService {
     }
 
 
+    public List<PostResponseDto> videoLikeList(UserAuth userAuth, Pageable page) {
+        List<PostResponseDto> videoLikeList = videoLikeListRepository.findByUserId(userAuth.getUserId(), page).orElseThrow(() -> new IllegalArgumentException("not found like list"))
+                .stream().map(v -> v.getVideo().getPost()).map(p -> p.toPostResponseDto()).toList();
+        return videoLikeList;
+    }
 }
