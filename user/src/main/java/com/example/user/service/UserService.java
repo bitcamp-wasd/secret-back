@@ -7,11 +7,15 @@ import com.example.user.component.Exception.NicknameFormatException;
 import com.example.user.component.Exception.PasswordFormatException;
 import com.example.user.dto.battle.response.BattleMyCommentDto;
 import com.example.user.dto.info.*;
+import com.example.user.dto.info.response.UserApiInfo;
+import com.example.user.dto.info.response.UserListDto;
+import com.example.user.dto.info.response.UserRankInfo;
 import com.example.user.entity.UserEntity;
 import com.example.user.entity.UserRankEntity;
 import com.example.user.repository.UserRankRepository;
 import com.example.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +31,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Log4j2
 public class UserService {
 
     private final UserRepository userRepository;
@@ -152,6 +157,17 @@ public class UserService {
                 userEntity.getRankId().getImagePath()
         );
         return userRankInfo;
+    }
+
+    public List<UserListDto> getUserList(List<Long> userId){
+
+        List<UserEntity> users = userRepository.findByUserIdIn(userId);
+
+        List<UserListDto> userList = users.stream()
+                .map(user -> new UserListDto(user.getUserId(), user.getNickname()))
+                .collect(Collectors.toList());
+
+        return userList;
     }
 
 }
