@@ -6,7 +6,7 @@ export const configProviders = [
     provide: 'config',
     useFactory: async () => {
       const configOptions: Options = {
-        endpoint: 'http://localhost:8082',
+        endpoint: 'http://10.0.8.8:8082',
         name: 'challenge',
         profiles: ['dev'],
         label: 'main',
