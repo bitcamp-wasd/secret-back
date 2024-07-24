@@ -38,8 +38,12 @@ public class PostService {
     private final CategoryRepository categoryRepository;
     private final PostRepository postRepository;
     private final SheetMusicRepository sheetMusicRepository;
+    private final VideoRepository videoRepository;
 
     private final AmazonS3 amazonS3;
+
+    @Value("${ncp.object-storage.encodingBucket}")
+    private String encodingBucket;
 
     @Value("${ncp.object-storage.videoBucket}")
     private String videoBucket;
@@ -201,12 +205,23 @@ public class PostService {
      * @param id
      */
     public void deletePost(UserAuth user, Long id) {
-        Post post = postRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("잘못된 게시물입니다."));
+
+        Video video = videoRepository.findByIdFetch(id).orElseThrow(() -> new IllegalArgumentException("잘못된 요청입니다."));
+        Post post = video.getPost();
 
         // 작성자 본인 확인
         if(post.getUserId() != user.getUserId())
             throw new IllegalArgumentException("해당 게시물을 삭제할 권한이 없습니다.");
 
+
+        amazonS3.deleteObject(videoBucket, video.getVideoPath() + ".mp4");
+        amazonS3.deleteObject(videoBucket,  video.getVideoPath() + "_AVC_HD_1Pass_30fps.mp4");
+        amazonS3.deleteObject(videoBucket,  video.getVideoPath() + "_AVC_SD_1Pass_30fps.mp4");
+        amazonS3.deleteObject(videoBucket,  video.getVideoPath() + "_AVC_SD_1Pass_30fps_1.mp4");
+        post.getVideo().getSheetMusicList().stream().forEach((sheetMusic -> {
+            amazonS3.deleteObject(sheetMusicBucket, sheetMusic.getPath());
+        }));
+        amazonS3.deleteObject(videoBucket, post.getThumbnailPath());
         postRepository.delete(post);
     }
 

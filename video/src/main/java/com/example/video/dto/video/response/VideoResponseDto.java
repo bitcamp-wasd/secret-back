@@ -1,4 +1,4 @@
-package com.example.video.dto.post.response;
+package com.example.video.dto.video.response;
 
 import com.example.video.entity.Category;
 import lombok.AllArgsConstructor;

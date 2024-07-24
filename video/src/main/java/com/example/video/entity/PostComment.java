@@ -10,6 +10,7 @@ import java.time.LocalDate;
 
 @Entity
 @NoArgsConstructor
+@Table(name="post_comment")
 public class PostComment {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
