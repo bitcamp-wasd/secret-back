@@ -132,19 +132,19 @@ public class BattleController {
         return ResponseEntity.ok(battleCommentService.getCommentCountByBattleId(battleId));
     }
 
-    // FeignClient 내가 쓴 배틀 댓글
-    @GetMapping("myComment")
-    public ResponseEntity<List<BattleMyCommentDto>> getCommentsByUserId(@RequestParam Long userId) {
-        List<BattleMyCommentDto> comments = battleCommentService.getCommentsByUserId(userId);
-        return ResponseEntity.ok(comments);
-    }
-
-    // FeignClient 내가 쓴 배틀 댓글 여러개 삭제
-    @DeleteMapping("myComments")
-    public ResponseEntity<Void> deleteBattleComments(@RequestParam Long userId,
-                                                     @RequestParam List<Long> battleCommentIds) {
-        battleCommentService.deleteBattleComments(userId, battleCommentIds);
-        return ResponseEntity.ok().build();
-    }
+//    // FeignClient 내가 쓴 배틀 댓글
+//    @GetMapping("myComment")
+//    public ResponseEntity<List<BattleMyCommentDto>> getCommentsByUserId(@RequestParam Long userId) {
+//        List<BattleMyCommentDto> comments = battleCommentService.getCommentsByUserId(userId);
+//        return ResponseEntity.ok(comments);
+//    }
+//
+//    // FeignClient 내가 쓴 배틀 댓글 여러개 삭제
+//    @DeleteMapping("myComments")
+//    public ResponseEntity<Void> deleteBattleComments(@RequestParam Long userId,
+//                                                     @RequestParam List<Long> battleCommentIds) {
+//        battleCommentService.deleteBattleComments(userId, battleCommentIds);
+//        return ResponseEntity.ok().build();
+//    }
 
 }

@@ -3,7 +3,7 @@ package com.example.battle.service;
 import com.example.battle.api.UserRestApi;
 import com.example.battle.dto.CommentDto;
 import com.example.battle.dto.response.BattleMyCommentDto;
-import com.example.battle.dto.user.response.UserRankInfoDto;
+import com.example.battle.dto.user.response.UserApiInfoDto;
 import com.example.battle.entity.Battle;
 import com.example.battle.entity.BattleComment;
 import com.example.battle.mapper.BattleMapper;
@@ -33,10 +33,10 @@ public class BattleCommentService {
         List<BattleComment> comments = battleMapper.getCommentsByBattleId(battleId, limit, offset);
         List<CommentDto> commentListDto = comments.stream()
                 .map(comment -> {
-                    UserRankInfoDto user = userRestApi.userRankInfo(comment.getUserId());
+                    UserApiInfoDto user = userRestApi.userApiInfo(comment.getUserId());
                     return new CommentDto(
                             comment.getBattleCommentId(),
-                            user.getImagePath(),
+                            user.getRankName(),
                             user.getNickname(),
                             comment.getCreateDate(),
                             comment.getComment()
@@ -53,10 +53,10 @@ public class BattleCommentService {
         return battleMapper.findCommentsByUserId(userId);
     }
 
-    @Transactional
-    public void deleteBattleComments(Long userId, List<Long> battleCommentIds) {
-        battleMapper.deleteBattleComments(userId, battleCommentIds);
-    }
+//    @Transactional
+//    public void deleteBattleComments(Long userId, List<Long> battleCommentIds) {
+//        battleMapper.deleteBattleComments(userId, battleCommentIds);
+//    }
 
     public void addComment(Long battleId, Long userId, String comment) {
         BattleComment battleComment = new BattleComment();
