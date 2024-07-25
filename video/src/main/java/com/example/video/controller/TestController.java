@@ -34,8 +34,5 @@ public class TestController {
     }
 
 
-    @GetMapping("openfeign")
-    public String openfeign(@RequestHeader("Authorization") String authorization) {
-        return userRestApi.test2(authorization);
-    }
+
 }
