@@ -12,4 +12,5 @@ import lombok.Setter;
 public class UserListDto {
     private Long userId;
     private String nickname;
+    private String rankname;
 }

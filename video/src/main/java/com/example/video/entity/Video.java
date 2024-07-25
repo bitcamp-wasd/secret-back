@@ -46,6 +46,10 @@ public class Video {
     @OneToOne(mappedBy = "video", fetch = FetchType.LAZY)
     Post post;
 
+    @OneToMany(mappedBy = "video", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    List<VideoLikeList> videoLikeList;
+
+
     public Video(String videoPath, String description, int length) {
         this.videoPath = videoPath;
         this.description = description;

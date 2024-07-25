@@ -137,10 +137,24 @@
         <result property="comment" column="comment"/>
         <result property="createDate" column="create_date"/>
         <result property="battleId" column="battle_id"/>
+        <result property="title" column="title"/>
     </resultMap>
 
     <select id="findCommentsByUserId" resultMap="BattleMyCommentResultMap">
-        SELECT battle_comment_id, comment, create_date, battle_id
+        SELECT bc.battle_comment_id AS battle_comment_id,
+               bc.comment AS comment,
+               bc.create_date AS create_date,
+               bc.battle_id AS battle_id,
+               b.title AS title
+        FROM battle_comment bc
+                 JOIN battle b ON bc.battle_id = b.battle_id
+        WHERE bc.user_id = #{userId}
+        ORDER BY bc.create_date DESC
+            LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countCommentsByUserId" resultType="int">
+        SELECT COUNT(*)
         FROM battle_comment
         WHERE user_id = #{userId}
     </select>

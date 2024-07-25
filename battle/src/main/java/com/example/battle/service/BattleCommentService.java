@@ -3,7 +3,7 @@ package com.example.battle.service;
 import com.example.battle.api.UserRestApi;
 import com.example.battle.dto.CommentDto;
 import com.example.battle.dto.response.BattleMyCommentDto;
-import com.example.battle.dto.user.response.UserRankInfoDto;
+import com.example.battle.dto.user.response.UserApiInfoDto;
 import com.example.battle.entity.Battle;
 import com.example.battle.entity.BattleComment;
 import com.example.battle.mapper.BattleMapper;
@@ -33,10 +33,10 @@ public class BattleCommentService {
         List<BattleComment> comments = battleMapper.getCommentsByBattleId(battleId, limit, offset);
         List<CommentDto> commentListDto = comments.stream()
                 .map(comment -> {
-                    UserRankInfoDto user = userRestApi.userRankInfo(comment.getUserId());
+                    UserApiInfoDto user = userRestApi.userApiInfo(comment.getUserId());
                     return new CommentDto(
                             comment.getBattleCommentId(),
-                            user.getImagePath(),
+                            user.getRankName(),
                             user.getNickname(),
                             comment.getCreateDate(),
                             comment.getComment()
@@ -49,12 +49,16 @@ public class BattleCommentService {
     }
 
     // 배틀에서 내가 쓴 댓글 리스트
-    public List<BattleMyCommentDto> getCommentsByUserId(Long userId) {
-        return battleMapper.findCommentsByUserId(userId);
+    public Page<BattleMyCommentDto> getCommentsByUserId(Long userId, int pageNumber, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        int offset = pageable.getPageNumber() * pageable.getPageSize();
+        List<BattleMyCommentDto> comments = battleMapper.findCommentsByUserId(userId, offset, pageable.getPageSize());
+        int total = battleMapper.countCommentsByUserId(userId);
+
+        return new PageImpl<>(comments, pageable, total);
     }
 
-    @Transactional
-    public void deleteBattleComments(Long userId, List<Long> battleCommentIds) {
+    public void deleteComments(Long userId, List<Long> battleCommentIds) {
         battleMapper.deleteBattleComments(userId, battleCommentIds);
     }
 

@@ -67,7 +67,11 @@ public interface BattleMapper {
     void decrementVote2Cnt(@Param("battleId") Long battleId);
 
     // 댓글
-    List<BattleMyCommentDto> findCommentsByUserId(@Param("userId") Long userId);
+    List<BattleMyCommentDto> findCommentsByUserId(@Param("userId") Long userId,
+                                                  @Param("offset") int offset,
+                                                  @Param("limit") int limit);
+
+    int countCommentsByUserId(@Param("userId") Long userId);
 
     void deleteBattleComments(@Param("userId") Long userId,
                               @Param("battleCommentIds") List<Long> battleCommentIds);

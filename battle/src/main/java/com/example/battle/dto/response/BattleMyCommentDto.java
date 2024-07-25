@@ -16,4 +16,5 @@ public class BattleMyCommentDto {
     private String comment;
     private LocalDateTime createDate;
     private Long battleId;
+    private String title; // 해당 배틀아이디의 제목
 }

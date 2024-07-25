@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UserRankInfoDto {
+public class UserApiInfoDto {
     private String nickname;
-    private String imagePath;
+    private String rankName;
 }
