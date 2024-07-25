@@ -14,7 +14,7 @@ public class CommentDto {
     private Long battleCommentId;
 
     // userId에 저장되어있는 랭크 이미지
-    private String imagePath;
+    private String rankname;
 
     // userId에 저장되어있는 닉네임
     private String nickname;

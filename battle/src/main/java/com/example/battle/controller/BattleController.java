@@ -5,12 +5,14 @@ import com.example.battle.dto.BattleDto;
 import com.example.battle.dto.BattleRegisterDto;
 import com.example.battle.dto.CommentDto;
 import com.example.battle.dto.auth.UserAuth;
+import com.example.battle.dto.battle.request.BattleCommentListDto;
 import com.example.battle.dto.response.BattleMyCommentDto;
 import com.example.battle.service.BattleCommentService;
 import com.example.battle.service.BattleService;
 import com.example.battle.service.BattleVoteService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -132,19 +134,19 @@ public class BattleController {
         return ResponseEntity.ok(battleCommentService.getCommentCountByBattleId(battleId));
     }
 
-//    // FeignClient 내가 쓴 배틀 댓글
-//    @GetMapping("myComment")
-//    public ResponseEntity<List<BattleMyCommentDto>> getCommentsByUserId(@RequestParam Long userId) {
-//        List<BattleMyCommentDto> comments = battleCommentService.getCommentsByUserId(userId);
-//        return ResponseEntity.ok(comments);
-//    }
-//
-//    // FeignClient 내가 쓴 배틀 댓글 여러개 삭제
-//    @DeleteMapping("myComments")
-//    public ResponseEntity<Void> deleteBattleComments(@RequestParam Long userId,
-//                                                     @RequestParam List<Long> battleCommentIds) {
-//        battleCommentService.deleteBattleComments(userId, battleCommentIds);
-//        return ResponseEntity.ok().build();
-//    }
+    // 마이페이지 댓글리스트
+    @GetMapping("/auth/myComments")
+    public ResponseEntity<Page<BattleMyCommentDto>> getMyComments(@HeaderUserAuth UserAuth userAuth,
+                                                                  @RequestParam(value = "page", defaultValue = "0") int page,
+                                                                  @RequestParam(value = "size", defaultValue = "10") int size) {
+        Page<BattleMyCommentDto> commentDtos = battleCommentService.getCommentsByUserId(userAuth.getUserId(), page, size);
+        return ResponseEntity.ok(commentDtos);
+    }
 
+    @DeleteMapping("/auth/myComments")
+    public ResponseEntity<String> deleteMyComments(@HeaderUserAuth UserAuth userAuth,
+                                                   @RequestBody BattleCommentListDto commentListDto) {
+        battleCommentService.deleteComments(userAuth.getUserId(), commentListDto.getBattleCommentId());
+        return ResponseEntity.ok("댓글이 성공적으로 삭제되었습니다");
+    }
 }

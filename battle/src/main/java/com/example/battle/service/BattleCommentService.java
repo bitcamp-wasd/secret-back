@@ -49,14 +49,18 @@ public class BattleCommentService {
     }
 
     // 배틀에서 내가 쓴 댓글 리스트
-    public List<BattleMyCommentDto> getCommentsByUserId(Long userId) {
-        return battleMapper.findCommentsByUserId(userId);
+    public Page<BattleMyCommentDto> getCommentsByUserId(Long userId, int pageNumber, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        int offset = pageable.getPageNumber() * pageable.getPageSize();
+        List<BattleMyCommentDto> comments = battleMapper.findCommentsByUserId(userId, offset, pageable.getPageSize());
+        int total = battleMapper.countCommentsByUserId(userId);
+
+        return new PageImpl<>(comments, pageable, total);
     }
 
-//    @Transactional
-//    public void deleteBattleComments(Long userId, List<Long> battleCommentIds) {
-//        battleMapper.deleteBattleComments(userId, battleCommentIds);
-//    }
+    public void deleteComments(Long userId, List<Long> battleCommentIds) {
+        battleMapper.deleteBattleComments(userId, battleCommentIds);
+    }
 
     public void addComment(Long battleId, Long userId, String comment) {
         BattleComment battleComment = new BattleComment();
