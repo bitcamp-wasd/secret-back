@@ -60,25 +60,6 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    // 마이페이지 댓글 리스트
-    @GetMapping("/auth/myComments")
-    public ResponseEntity<Page<Object>> getMyComments(@HeaderUserAuth UserAuth userAuth,
-                                                      @RequestParam(defaultValue = "0") int pageNumber,
-                                                      @RequestParam(defaultValue = "10") int pageSize)
-            throws JsonProcessingException {
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        Page<Object> comments = userService.getMyComments(userAuth.getUserId(), pageable);
-        return ResponseEntity.ok(comments);
-    }
-
-    // 마이페이지 댓글 리스트 삭제
-    @DeleteMapping("/auth/myComments")
-    public ResponseEntity<Void> deleteComments(@HeaderUserAuth UserAuth userAuth,
-                                               @RequestParam List<Long> battleCommentIds){
-        userService.deleteComments(userAuth.getUserId(), battleCommentIds);
-        return ResponseEntity.ok().build();
-    }
-
     @GetMapping("info")
     public ResponseEntity<UserApiInfo> getUserApiInfo(@RequestParam("userId") Long userId)
             throws JsonProcessingException {

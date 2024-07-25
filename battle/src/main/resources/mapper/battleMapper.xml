@@ -132,16 +132,29 @@
     </select>
 
     <!-- 마이페이지 댓글 게시판-->
-    <resultMap id="BattleMyCommentResultMap" type="com.example.battle.dto.response.BattleMyCommentDto">
-        <id property="battleCommentId" column="battle_comment_id"/>
-        <result property="comment" column="comment"/>
-        <result property="createDate" column="create_date"/>
-        <result property="battleId" column="battle_id"/>
-    </resultMap>
+<!--    <resultMap id="BattleMyCommentResultMap" type="com.example.battle.dto.response.BattleMyCommentDto">-->
+<!--        <id property="battleCommentId" column="battle_comment_id"/>-->
+<!--        <result property="comment" column="comment"/>-->
+<!--        <result property="createDate" column="create_date"/>-->
+<!--        <result property="battleId" column="battle_id"/>-->
+<!--    </resultMap>-->
 
-    <select id="findCommentsByUserId" resultMap="BattleMyCommentResultMap">
-        SELECT battle_comment_id, comment, create_date, battle_id
-        FROM battle_comment
+    <select id="findCommentsByUserId" resultMap="com.example.battle.dto.response.BattleMyCommentDto">
+        SELECT bc.battle_comment_id AS battleCommentId,
+               bc.comment AS comment,
+               bc.create_date AS createDate,
+               bc.battle_id AS battleId,
+               b.title AS title
+        FROM battle_comments bc
+        JOIN battles b ON bc.battle_id = b.battle_id
+        WHERE bc.user_id = #{userId}
+        ORDER BY bc.create_date DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countCommentsByUserId" resultType="int">
+        SELECT COUNT(*)
+        FROM battle_comments
         WHERE user_id = #{userId}
     </select>
 
