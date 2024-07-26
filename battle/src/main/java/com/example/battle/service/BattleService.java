@@ -10,6 +10,7 @@ import com.example.battle.dto.post.response.PostUserIdDto;
 import com.example.battle.entity.Battle;
 import com.example.battle.entity.BattleVoteList;
 import com.example.battle.mapper.BattleMapper;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Pageable;
@@ -23,7 +24,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -126,6 +129,9 @@ public class BattleService {
         battleMapper.incrementViews(battleId);
 
         Battle battle = battleMapper.getBattleById(battleId);
+        if (battle == null){
+            throw new IllegalArgumentException("해당 게시글을 찾을 수 없습니다.");
+        }
         BattleDto battleDto = new BattleDto();
 
         battleDto.setBattleId(battle.getBattleId());
@@ -136,35 +142,7 @@ public class BattleService {
         battleDto.setVote1Cnt((long) battle.getVote1Cnt());
         battleDto.setVote2Cnt((long) battle.getVote2Cnt());
 
-        Long postId1 = battle.getPostId1();
-        Long postId2 = battle.getPostId2();
-
-        PostInfoDto post1 = videoRestApi.videoInfo(postId1);
-        PostInfoDto post2 = videoRestApi.videoInfo(postId2);
-
-        // BattleDto에 PostDto 설정
-        battleDto.setPostId1(post1);
-        battleDto.setPostId2(post2);
-
-        return battleDto;
-    }
-
-    public Slice<BattleDto> getBattles(String state, Pageable pageable) {
-        int offset = (int)pageable.getOffset();
-        int limit = pageable.getPageSize();
-        int total = battleMapper.countByState(state);
-
-        List<Battle> battles = battleMapper.findByStateBattle(state, limit, offset);
-        List<BattleDto> battleDtos = battles.stream().map(battle -> {
-
-            BattleDto battleDto = new BattleDto();
-
-            battleDto.setBattleId(battle.getBattleId());
-            battleDto.setTitle(battle.getTitle());
-            battleDto.setViews((long) battle.getViews());
-            battleDto.setEndDate(battle.getEndDate());
-            battleDto.setVote1Cnt((long) battle.getVote1Cnt());
-            battleDto.setVote2Cnt((long) battle.getVote2Cnt());
+        try{
 
             Long postId1 = battle.getPostId1();
             Long postId2 = battle.getPostId2();
@@ -176,8 +154,69 @@ public class BattleService {
             battleDto.setPostId1(post1);
             battleDto.setPostId2(post2);
 
+        }catch (FeignException.NotFound e){
+            // 비디오가 삭제된 경우 예외처리
+            deleteBattleRelatedData(battleId);
+            throw new IllegalStateException("해당게시물이 삭제 되었습니다");
+
+        }
+
+        return battleDto;
+    }
+
+    public Slice<BattleDto> getBattles(String state, Pageable pageable) {
+        int offset = (int)pageable.getOffset();
+        int limit = pageable.getPageSize();
+        int total = battleMapper.countByState(state);
+
+        List<Battle> battles = battleMapper.findByStateBattle(state, limit, offset);
+        List<BattleDto> battleDtos = battles.stream().map(battle -> {
+            BattleDto battleDto = new BattleDto();
+
+            battleDto.setBattleId(battle.getBattleId());
+            battleDto.setTitle(battle.getTitle());
+            battleDto.setViews((long) battle.getViews());
+            battleDto.setUserId(battle.getUserId());
+            battleDto.setEndDate(battle.getEndDate());
+            battleDto.setVote1Cnt((long) battle.getVote1Cnt());
+            battleDto.setVote2Cnt((long) battle.getVote2Cnt());
+
+            boolean shouldDelete = false;
+
+            try {
+                Long postId1 = battle.getPostId1();
+                PostInfoDto post1 = videoRestApi.videoInfo(postId1);
+                battleDto.setPostId1(post1);
+            } catch (FeignException e) {
+                // postId1를 찾지 못한 경우 null로 설정
+                battle.setPostId1(null);
+                battleDto.setPostId1(null);
+                // 데이터베이스에서 해당 postId를 null로 업데이트
+                battleMapper.updatePostId1ToNull(battle.getBattleId());
+                shouldDelete = true;
+            }
+
+            try {
+                Long postId2 = battle.getPostId2();
+                PostInfoDto post2 = videoRestApi.videoInfo(postId2);
+                battleDto.setPostId2(post2);
+            } catch (FeignException e) {
+                // postId2를 찾지 못한 경우 null로 설정
+                battle.setPostId2(null);
+                battleDto.setPostId2(null);
+                // 데이터베이스에서 해당 postId를 null로 업데이트
+                battleMapper.updatePostId2ToNull(battle.getBattleId());
+                shouldDelete = true;
+            }
+
+            if (shouldDelete) {
+                // 하나라도 postId가 null인 경우 battle 삭제
+                deleteBattleRelatedData(battle.getBattleId());
+                return null; // 리스트에서 제거
+            }
+
             return battleDto;
-        }).collect(Collectors.toList());
+        }).filter(Objects::nonNull).collect(Collectors.toList());
 
         boolean hasNext = offset + limit < total;
         return new SliceImpl<>(battleDtos, pageable, hasNext);
@@ -199,22 +238,46 @@ public class BattleService {
             battleDto.setBattleId(battle.getBattleId());
             battleDto.setTitle(battle.getTitle());
             battleDto.setViews((long) battle.getViews());
+            battleDto.setUserId(battle.getUserId());
             battleDto.setEndDate(battle.getEndDate());
             battleDto.setVote1Cnt((long) battle.getVote1Cnt());
             battleDto.setVote2Cnt((long) battle.getVote2Cnt());
 
-            Long postId1 = battle.getPostId1();
-            Long postId2 = battle.getPostId2();
+            boolean shouldDelete = false;
 
-            PostInfoDto post1 = videoRestApi.videoInfo(postId1);
-            PostInfoDto post2 = videoRestApi.videoInfo(postId2);
+            try {
+                Long postId1 = battle.getPostId1();
+                PostInfoDto post1 = videoRestApi.videoInfo(postId1);
+                battleDto.setPostId1(post1);
+            } catch (FeignException e) {
+                // postId1를 찾지 못한 경우 null로 설정
+                battle.setPostId1(null);
+                battleDto.setPostId1(null);
+                // 데이터베이스에서 해당 postId를 null로 업데이트
+                battleMapper.updatePostId1ToNull(battle.getBattleId());
+                shouldDelete = true;
+            }
 
-            // BattleDto에 PostDto 설정
-            battleDto.setPostId1(post1);
-            battleDto.setPostId2(post2);
+            try {
+                Long postId2 = battle.getPostId2();
+                PostInfoDto post2 = videoRestApi.videoInfo(postId2);
+                battleDto.setPostId2(post2);
+            } catch (FeignException e) {
+                // postId2를 찾지 못한 경우 null로 설정
+                battle.setPostId2(null);
+                battleDto.setPostId2(null);
+                // 데이터베이스에서 해당 postId를 null로 업데이트
+                battleMapper.updatePostId2ToNull(battle.getBattleId());
+                shouldDelete = true;
+            }
 
+            if (shouldDelete) {
+                // 하나라도 postId가 null인 경우 battle 삭제
+                deleteBattleRelatedData(battle.getBattleId());
+                return null; // 리스트에서 제거
+            }
             return battleDto;
-        }).collect(Collectors.toList());
+        }).filter(Objects::nonNull).collect(Collectors.toList());
 
         boolean hasNext = offset + limit < total;
 
@@ -231,9 +294,17 @@ public class BattleService {
             throw new IllegalArgumentException("Battle user does not match");
         }
 
-        battleMapper.deleteCommentsByBattleId(battleId);
-        battleMapper.deleteVotesByBattleId(battleId);
-        battleMapper.deleteBattleByBattleId(battleId);
+        deleteBattleRelatedData(battleId);
+    }
+
+    private void deleteBattleRelatedData(Long battleId) {
+        try {
+            battleMapper.deleteCommentsByBattleId(battleId);
+            battleMapper.deleteVotesByBattleId(battleId);
+            battleMapper.deleteBattleByBattleId(battleId);
+        } catch (Exception e){
+            throw new IllegalStateException("배틀 게시물 삭제 중 오류" + e.getMessage(),e);
+        }
     }
 
 }
