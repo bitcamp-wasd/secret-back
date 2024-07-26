@@ -14,6 +14,6 @@ public class MyCommentResponseDto {
     private String comment;
     private String title;
     private LocalDateTime createDate;
-
+    private Long videoId;
 
 }

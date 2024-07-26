@@ -11,8 +11,10 @@ import com.example.video.dto.comment.response.MyCommentResponseDto;
 import com.example.video.dto.comment.response.UserResponseDto;
 import com.example.video.entity.Post;
 import com.example.video.entity.PostComment;
+import com.example.video.entity.Video;
 import com.example.video.repository.PostCommentRepository;
 import com.example.video.repository.PostRepository;
+import com.example.video.repository.VideoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -31,6 +33,7 @@ import java.util.stream.Collectors;
 public class PostCommentService {
 
     private final VideoService videoService;
+    private final VideoRepository videoRepository;
     private final PostRepository postRepository;
     private final PostCommentRepository postCommentRepository;
     private final UserRestApi userRestApi;
@@ -41,9 +44,13 @@ public class PostCommentService {
 
         Post post = postRepository.findById(postId).orElseThrow(()-> new IllegalArgumentException("not found post"));
 
+        Video video = post.getVideo();
+
         PostComment postComment = new PostComment(userAuth.getUserId(), post, insertCommentRequestDto.getComment());
+        video.plusCommentCount();
 
         postCommentRepository.save(postComment);
+        videoRepository.save(video);
     }
 
     public List<CommentResponseDto> getComment(Long videoId, Pageable page) {
@@ -74,6 +81,16 @@ public class PostCommentService {
     }
 
     public void deleteComments(UserAuth userAuth, DeleteCommentRequestDto deleteCommentRequestDto) {
+
+        List<PostComment> postComments = postCommentRepository.findAllByIdFetch(deleteCommentRequestDto.getCommentIds());
+
+        List<Video> videos = postComments.stream().map((c) -> {
+            Video v = c.getPost().getVideo();
+            v.minusCommentCount();
+            return v;
+        }).toList();
+
+        videoRepository.saveAll(videos);
         postCommentRepository.deleteAllById(userAuth.getUserId(), deleteCommentRequestDto.getCommentIds());
     }
 
