@@ -67,7 +67,7 @@ public class BattleController {
     }
 
     // 내가 올린 배틀 리스트
-    @GetMapping("/auth/myBattle")
+    @GetMapping("/auth/mybattle")
     public ResponseEntity<Slice<BattleDto>> getMyBattleList(@HeaderUserAuth UserAuth userAuth,
                                                             @RequestParam(defaultValue = "0") int pageNumber,
                                                             @RequestParam(defaultValue = "10") int pageSize) {
@@ -135,7 +135,7 @@ public class BattleController {
     }
 
     // 마이페이지 댓글리스트
-    @GetMapping("/auth/mycomments")
+    @GetMapping("/auth/mycomment")
     public ResponseEntity<Page<BattleMyCommentDto>> getMyComments(@HeaderUserAuth UserAuth userAuth,
                                                                   @RequestParam(value = "page", defaultValue = "0") int page,
                                                                   @RequestParam(value = "size", defaultValue = "10") int size) {
@@ -143,7 +143,7 @@ public class BattleController {
         return ResponseEntity.ok(commentDtos);
     }
 
-    @DeleteMapping("/auth/mycomments")
+    @DeleteMapping("/auth/mycomment")
     public ResponseEntity<String> deleteMyComments(@HeaderUserAuth UserAuth userAuth,
                                                    @RequestBody BattleCommentListDto commentListDto) {
         battleCommentService.deleteComments(userAuth.getUserId(), commentListDto.getBattleCommentId());
