@@ -38,6 +38,9 @@ public interface BattleMapper {
 
     int countByState(@Param("state") String state);
 
+    void updatePostId1ToNull(@Param("battleId") Long battleId);
+    void updatePostId2ToNull(@Param("battleId") Long battleId);
+
     // 배틀 게시판 삭제 시 관련 데이터 삭제
     void deleteCommentsByBattleId(@Param("battleId") Long battleId);
     void deleteVotesByBattleId(@Param("battleId") Long battleId);
