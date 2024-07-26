@@ -28,4 +28,7 @@ public interface PostCommentRepository extends JpaRepository<PostComment, Long> 
 
     @Query("SELECT c FROM PostComment c JOIN FETCH c.post p WHERE c.userId = :userId")
     Page<PostComment> findByIdFetchPost(Long userId, Pageable page);
+
+    @Query("SELECT c FROM PostComment c JOIN FETCH c.post p JOIN FETCH p.video WHERE c.commentId IN (:commentIds)")
+    List<PostComment> findAllByIdFetch(List<Long> commentIds);
 }

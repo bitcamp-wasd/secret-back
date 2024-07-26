@@ -61,7 +61,8 @@ public class PostComment {
                 postComment.getCommentId(),
                 postComment.getComment(),
                 postComment.getPost().getTitle(),
-                postComment.getCreateDate()
+                postComment.getCreateDate(),
+                postComment.getPost().getVideo().getId()
         );
     }
 }

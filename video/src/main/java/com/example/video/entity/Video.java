@@ -101,4 +101,7 @@ public class Video {
     public void minusLikeCount() {
         this.likeCount -= 1;
     }
+
+    public void plusCommentCount() {this.commentCount += 1;}
+    public void minusCommentCount() {this.commentCount -= 1;}
 }
