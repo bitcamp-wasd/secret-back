@@ -6,6 +6,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ChallengeListSchema } from './challengeList.collection';
 import { ChallengeModule } from 'src/challenge/challenge.module';
 import { VoteModule } from 'src/vote/vote.module';
+import { RestApiModule } from 'src/restApi/api.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { VoteModule } from 'src/vote/vote.module';
     ]),
     ChallengeModule,
     VoteModule,
+    RestApiModule,
   ],
   controllers: [ChallengeListController],
   providers: [ChallengeListService],
