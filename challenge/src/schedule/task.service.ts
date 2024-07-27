@@ -20,7 +20,7 @@ export class TaskService {
     this.challengeService.startVoteChallenge();
   }
 
-  @Cron('0 0 10 * * *')
+  @Cron('0 0 0 * * *')
   async endChallenge() {
     this.logger.debug('챌린지 종료');
     this.challengeService.endChallenge();

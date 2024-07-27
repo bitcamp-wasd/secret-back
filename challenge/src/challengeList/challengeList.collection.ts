@@ -10,6 +10,17 @@ export class ChallengeList {
   userId: number;
   @Prop()
   cnt: number;
+  @Prop()
+  title: string;
+
+  @Prop()
+  category: string;
+
+  @Prop()
+  description: string;
+
+  @Prop()
+  length: number;
 }
 
 export const ChallengeListSchema = SchemaFactory.createForClass(ChallengeList);

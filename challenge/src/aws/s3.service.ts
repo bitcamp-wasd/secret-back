@@ -1,4 +1,4 @@
-import { PutObjectAclCommand, S3Client } from '@aws-sdk/client-s3';
+import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Injectable } from '@nestjs/common';
 import { SpringCloudConfig } from 'src/config/cloud.config';
@@ -9,8 +9,8 @@ export class S3Service {
 
   constructor(private springCloudConfig: SpringCloudConfig) {
     this.s3Client = new S3Client({
-      region: springCloudConfig.get('ncp.region'),
-      endpoint: springCloudConfig.get('ncp.endPoint'),
+      region: this.springCloudConfig.get('ncp.region'),
+      endpoint: this.springCloudConfig.get('ncp.endPoint'),
       credentials: {
         accessKeyId: this.springCloudConfig.get('ncp.accessKey'),
         secretAccessKey: this.springCloudConfig.get('ncp.secretKey'),
@@ -19,9 +19,8 @@ export class S3Service {
   }
 
   async uploadVideo(uuid: string) {
-    const command = new PutObjectAclCommand({
+    const command = new PutObjectCommand({
       Bucket: this.springCloudConfig.get('ncp.object-storage.videoBucket'),
-      ACL: 'public-read',
       Key: uuid + '.mp4',
     });
 
@@ -29,9 +28,10 @@ export class S3Service {
       this.s3Client,
       command,
       {
-        expiresIn: 3600,
+        expiresIn: 36000,
       },
     );
+
     return {
       videoPresignedUrl,
       videoFilename: uuid,
@@ -41,16 +41,16 @@ export class S3Service {
   async uploadThumbnail(filename: string, uuid: string) {
     const fileExtend = this.extractFileExtend(filename).toLowerCase();
 
-    const command = new PutObjectAclCommand({
+    const command = new PutObjectCommand({
       Bucket: this.springCloudConfig.get('ncp.object-storage.thumbnailBucket'),
-      ACL: 'public-read',
       Key: uuid + fileExtend,
     });
 
+    const thumbnailPresignedUrl = await getSignedUrl(this.s3Client, command, {
+      expiresIn: 36000,
+    });
     return {
-      thumbnailPresignedUrl: await getSignedUrl(this.s3Client, command, {
-        expiresIn: 3600,
-      }),
+      thumbnailPresignedUrl: thumbnailPresignedUrl,
       thumbnailFilename: uuid + fileExtend,
     };
   }

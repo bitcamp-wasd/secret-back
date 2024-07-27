@@ -9,6 +9,8 @@ import { S3Module } from './aws/s3.module';
 import { ChallengeListModule } from './challengeList/challengeList.module';
 import { VoteModule } from './vote/vote.module';
 import { TaskModule } from './schedule/task.module';
+import { RestApiModule } from './restApi/api.module';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
   imports: [
@@ -19,6 +21,8 @@ import { TaskModule } from './schedule/task.module';
     ChallengeListModule,
     VoteModule,
     TaskModule,
+    RestApiModule,
+    CommentModule,
   ],
   controllers: [],
   providers: [SpringCloudConfig],
