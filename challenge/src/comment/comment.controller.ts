@@ -48,6 +48,7 @@ export class CommentController {
     @UserAuth('user') userAuth: UserAuthDto,
     @Body() deleteComment: DeleteCommentReqDto,
   ) {
+    console.log(deleteComment);
     await this.commentService.deleteComment(userAuth, deleteComment);
   }
 

@@ -26,6 +26,10 @@ export class ChallengeListService {
     private readonly restApiService: RestApiService,
   ) {}
 
+  async checkVote(userAuth: UserAuthDto, voteRequestDto: VoteRequestDto) {
+    return await this.voteService.checkVote(userAuth, voteRequestDto);
+  }
+
   /**
    * 챌린지 동영상 업로드하기
    * @param userAuth

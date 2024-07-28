@@ -38,4 +38,12 @@ export class ChallengeListController {
   async watch(@Query('videoId') videoId: string) {
     return await this.challengeListService.findByChallengeVideo(videoId);
   }
+
+  @Post('auth/vote/check')
+  async checkVote(
+    @UserAuth('user') userAuth: UserAuthDto,
+    @Body() voteRequestDto: VoteRequestDto,
+  ) {
+    return await this.challengeListService.checkVote(userAuth, voteRequestDto);
+  }
 }
