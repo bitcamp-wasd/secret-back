@@ -89,7 +89,8 @@ public class Post {
                 post.getTitle(),
                 post.getViews(),
                 video.getLength(),
-                post.getUserNickname()
+                post.getUserNickname(),
+                post.getUploadDate()
         );
     }
 

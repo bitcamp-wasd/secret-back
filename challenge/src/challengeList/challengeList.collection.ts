@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import * as mongoosePaginate from 'mongoose-paginate-v2';
 
 @Schema({ collection: 'challengeList' })
 export class ChallengeList {
@@ -23,4 +24,7 @@ export class ChallengeList {
   length: number;
 }
 
-export const ChallengeListSchema = SchemaFactory.createForClass(ChallengeList);
+const schema = SchemaFactory.createForClass(ChallengeList);
+schema.set('timestamps', { createdAt: true });
+schema.plugin(mongoosePaginate);
+export const ChallengeListSchema = schema;

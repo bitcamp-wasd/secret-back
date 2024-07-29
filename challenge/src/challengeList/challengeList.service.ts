@@ -2,7 +2,7 @@ import { Injectable, Logger, NotAcceptableException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { S3Service } from 'src/aws/s3.service';
 import { ChallengeList } from './challengeList.collection';
-import { Model } from 'mongoose';
+import { Model, PaginateModel } from 'mongoose';
 import { UserAuthDto } from 'src/auth/userAuth.dto';
 import { challengeUploadDto } from './dto/request/challenge-upload.dto';
 import * as crypto from 'crypto';
@@ -21,10 +21,23 @@ export class ChallengeListService {
     private readonly s3Service: S3Service,
     @InjectModel(ChallengeList.name)
     private challengeListModel: Model<ChallengeList>,
+    @InjectModel(ChallengeList.name)
+    private challengeListPageModel: PaginateModel<ChallengeList>,
     private readonly challengeService: ChallengeService,
     private readonly voteService: VoteService,
     private readonly restApiService: RestApiService,
   ) {}
+
+  async myChallenge(userAuth: UserAuthDto, pageNumber: number) {
+    return this.challengeListPageModel.paginate(
+      { userId: userAuth.userId },
+      {
+        sort: { createdAt: -1 },
+        limit: 10,
+        page: pageNumber + 1,
+      },
+    );
+  }
 
   async checkVote(userAuth: UserAuthDto, voteRequestDto: VoteRequestDto) {
     return await this.voteService.checkVote(userAuth, voteRequestDto);
