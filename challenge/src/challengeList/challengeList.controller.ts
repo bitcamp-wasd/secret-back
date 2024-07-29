@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ChallengeListService } from './challengeList.service';
 import { challengeUploadDto } from './dto/request/challenge-upload.dto';
 import { UserAuth } from 'src/auth/headers.decorator';
@@ -32,5 +32,18 @@ export class ChallengeListController {
     @Body() voteRequestDto: VoteRequestDto,
   ) {
     await this.challengeListService.voteChallengeList(userAuth, voteRequestDto);
+  }
+
+  @Get('watch')
+  async watch(@Query('videoId') videoId: string) {
+    return await this.challengeListService.findByChallengeVideo(videoId);
+  }
+
+  @Post('auth/vote/check')
+  async checkVote(
+    @UserAuth('user') userAuth: UserAuthDto,
+    @Body() voteRequestDto: VoteRequestDto,
+  ) {
+    return await this.challengeListService.checkVote(userAuth, voteRequestDto);
   }
 }

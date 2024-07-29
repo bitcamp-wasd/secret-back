@@ -19,15 +19,23 @@ public class TokenUtils {
         return authorization.substring(7);
     }
 
+//    public static String parseRefreshToken(HttpServletRequest request) {
+//        Cookie[] cookies = request.getCookies();
+//        if (cookies != null) {
+//            for (Cookie cookie : cookies) {
+//                if (cookie.getName().equals("refresh_token")) {
+//                    return cookie.getValue();
+//                }
+//            }
+//        }
+//        return null;
+//    }
+
     // 요청에서 리프레시 토큰을 가져옴
     public static String parseRefreshToken(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("refresh_token")) {
-                    return cookie.getValue();
-                }
-            }
+        String authorization = request.getHeader("Authorization");
+        if (authorization != null && authorization.startsWith("Bearer ")) {
+            return authorization.substring(7);
         }
         return null;
     }

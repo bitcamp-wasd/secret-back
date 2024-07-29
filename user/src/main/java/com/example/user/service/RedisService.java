@@ -45,7 +45,11 @@ public class RedisService {
         String value = get(token);
         log.info(value);
         if (value != null) {
-            return new ObjectMapper().readValue(value, TokenData.class);
+            try {
+                return new ObjectMapper().readValue(value, TokenData.class);
+            } catch (JsonProcessingException e) {
+                log.error("Error parsing token data", e);
+            }
         }
         return null;
     }

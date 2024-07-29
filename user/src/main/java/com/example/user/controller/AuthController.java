@@ -22,6 +22,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
 @Log4j2
@@ -90,7 +93,7 @@ public class AuthController {
         return responseEntity;
     }
 
-    @PostMapping("/refresh-token")
+    @PostMapping("/auth/refreshtoken")
     public ResponseEntity<?> refreshToken(HttpServletRequest request, HttpServletResponse response) throws JsonProcessingException {
         String refreshToken = TokenUtils.parseRefreshToken(request);
 
@@ -102,16 +105,22 @@ public class AuthController {
                     Long userId = tokenData.userId;
                     String role = tokenData.role;
                     String nickName = tokenData.nickName;
-                    String newAccessToken = jwtProvider.create(userId, role, nickName,3600);
+                    int expirationTime =3600;
+                    String newAccessToken = jwtProvider.create(userId, role, nickName,expirationTime);
 
                     // Redis에 새 엑세스 토큰 저장
-                    redisService.setTokenData(newAccessToken, userId, role, nickName,3600);
+                    redisService.setTokenData(newAccessToken, userId, role, nickName,expirationTime);
 
                     log.info(redisService.getTokenData(newAccessToken));
                     // 응답 헤더에 새로 발급된 액세스 토큰 포함
                     response.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + newAccessToken);
 
-                    return ResponseEntity.ok(newAccessToken);
+                    // 새 엑세스 토큰과 함께 클라이언트에 전달할 정보 생성
+                    Map<String, Object> responseBody = new HashMap<>();
+                    responseBody.put("accessToken", newAccessToken);
+                    responseBody.put("expirationTime", expirationTime);
+
+                    return ResponseEntity.ok(responseBody);
                 }
             }
         }

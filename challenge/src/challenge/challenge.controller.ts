@@ -4,6 +4,7 @@ import {
   Get,
   HttpException,
   HttpStatus,
+  NotFoundException,
   Post,
   Query,
 } from '@nestjs/common';
@@ -12,6 +13,8 @@ import { UserAuthDto } from 'src/auth/userAuth.dto';
 import { ChallengeService } from './challenge.service';
 import { Types } from 'mongoose';
 import { NewChallengeRequestDto } from './dto/request/new-challenge.dto';
+import { ChallengeBannerResponseDto } from './dto/response/challenge-data-res.dto';
+import { CompleteChallengeDto } from './dto/response/challenge-complete-res.dto';
 
 @Controller()
 export class ChallengeController {
@@ -37,6 +40,20 @@ export class ChallengeController {
     return id;
   }
 
+  @Get('banner')
+  async banner(): Promise<ChallengeBannerResponseDto> {
+    const banner = await this.challengeService.getBanner();
+    return banner;
+  }
+
+  @Get('complete')
+  async completelist(
+    @Query('pageNumber') pageNumber: number,
+  ): Promise<CompleteChallengeDto[]> {
+    const list = await this.challengeService.getCompleteList(pageNumber);
+    return list;
+  }
+
   /**
    * 챌린지 pagination 기능
    * @param page
@@ -47,23 +64,14 @@ export class ChallengeController {
     return (await this.challengeService.challengeList(page)).docs;
   }
 
-  @Get('auth/test')
-  async getTest(
-    @UserAuth('user') userAuth: UserAuthDto,
-    @Query('test') test: string,
-  ) {
-    try {
-      await this.challengeService.chekcUserDuplicate(userAuth, test);
-      return await this.challengeService.getChallengeAndChallengeVideo(test);
-    } catch (error) {
-      throw error;
-    }
-  }
-
   @Get('view')
   async getChallenge(@Query('challengeId') challengeId: string) {
-    return await this.challengeService.getChallengeAndChallengeVideo(
-      challengeId,
-    );
+    try {
+      return await this.challengeService.getChallengeAndChallengeVideo(
+        challengeId,
+      );
+    } catch (error) {
+      throw new NotFoundException('존재하지 않는 챌린지 입니다.');
+    }
   }
 }

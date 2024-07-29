@@ -4,8 +4,11 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types, PaginateModel } from 'mongoose';
 import { UserAuthDto } from 'src/auth/userAuth.dto';
 import { NewChallengeRequestDto } from './dto/request/new-challenge.dto';
-import { VoteRequestDto } from 'src/vote/dto/request/voteRequest.dto';
 import { State } from './state.enum';
+import { ChallengeBannerResponseDto } from './dto/response/challenge-data-res.dto';
+import { CompleteChallengeDto } from './dto/response/challenge-complete-res.dto';
+import { RestApiService } from 'src/restApi/api.service';
+import { ChallengeVideo } from './dto/response/challengeVideo.dto';
 
 @Injectable()
 export class ChallengeService {
@@ -15,7 +18,40 @@ export class ChallengeService {
     @InjectModel(Challenge.name) private challengeModel: Model<Challenge>,
     @InjectModel(Challenge.name)
     private paginateChallengeModel: PaginateModel<Challenge>,
+    private readonly restApiService: RestApiService,
   ) {}
+
+  async getCompleteList(pageNumber: number) {
+    const completeList = await this.paginateChallengeModel.paginate(
+      {
+        state: State.COMPLETE,
+      },
+      {
+        sort: { createdAt: -1 },
+        limit: 16,
+        page: pageNumber + 1,
+      },
+    );
+
+    const response = completeList.docs.map(
+      (challenge) => new CompleteChallengeDto(challenge._id, challenge.title),
+    );
+    return response;
+  }
+
+  async getBanner() {
+    const challenge = await this.challengeModel.findOne({
+      state: [State.RECRUITMENT, State.RECRUITMENT_COMPLETE, State.VOTE],
+    });
+
+    return new ChallengeBannerResponseDto(
+      challenge._id,
+      challenge.title,
+      challenge.endDate,
+      challenge.voteEndDate,
+      challenge.state,
+    );
+  }
 
   /**
    * 투표 종료 및 정산
@@ -28,11 +64,7 @@ export class ChallengeService {
       .populate('challengeList')
       .exec();
 
-    this.logger.debug(challenges);
     challenges.forEach((challenge) => {
-      this.logger.debug(challenge.challengeList);
-      this.logger.debug(typeof challenge.ChallengeList);
-
       if (challenge.voteEndDate >= new Date()) return;
 
       challenge.state = State.COMPLETE;
@@ -40,8 +72,7 @@ export class ChallengeService {
       const challengeList: any = Array(challenge.challengeList).sort(
         (a, b) => b.cnt - a.cnt,
       );
-      this.logger.debug(challenge.challengeList);
-      this.logger.debug(challengeList);
+
       const ranking = new Map();
 
       for (let i = 0; i < challengeList.length; i++) {
@@ -163,33 +194,50 @@ export class ChallengeService {
     });
   }
 
-  /**
-   * 투표 수 하나 늘리기
-   * @param voteRequestDto
-   * @returns
-   */
-  async incrementVoteCnt(voteRequestDto: VoteRequestDto) {
-    return this.challengeModel
-      .findOneAndUpdate(
-        {
-          _id: voteRequestDto.challengeId,
-          'challengeList._id': voteRequestDto.challengeListId,
-        },
-        { $inc: { 'challengeList.$.cnt': 1 } },
-        { new: true },
-      )
-      .exec();
-  }
-
   async getChallenge(challengeId: string) {
     return this.challengeModel.findById(challengeId);
   }
 
   async getChallengeAndChallengeVideo(challengeId: string) {
-    return await this.challengeModel
+    const challenge = await this.challengeModel
       .findById(challengeId)
       .populate('challengeList')
       .exec();
+
+    const challengeList: any = challenge.challengeList;
+
+    const userIds = challengeList.map((c) => c.userId);
+    const users = await this.restApiService.getUser(userIds);
+
+    const userMap = new Map<number, any>();
+
+    users.forEach((user) => {
+      const { userId, ...next } = user;
+      userMap.set(userId, next);
+    });
+
+    const list = challenge.challengeList.map((challengeList: any) => {
+      try {
+        const data = new ChallengeVideo(
+          challengeList._id,
+          challengeList.videoPath,
+          challengeList.title,
+          challengeList.category,
+          challengeList.thumbnailPath,
+          challengeList.description,
+          challengeList.length,
+          challengeList.userId,
+          challengeList.cnt,
+          userMap.get(challengeList.userId),
+        );
+
+        return data;
+      } catch (error) {
+        console.log(error);
+      }
+    });
+
+    return list;
   }
 
   async checkState(challengeId: string, state: State, errorMessage) {
