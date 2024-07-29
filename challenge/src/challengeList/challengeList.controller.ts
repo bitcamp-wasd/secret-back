@@ -46,4 +46,13 @@ export class ChallengeListController {
   ) {
     return await this.challengeListService.checkVote(userAuth, voteRequestDto);
   }
+
+  @Get('post/auth/myposts')
+  async mychallengePost(
+    @UserAuth('user') userAuth: UserAuthDto,
+    @Query('pageNumber') pageNumber: number,
+  ) {
+    return (await this.challengeListService.myChallenge(userAuth, pageNumber))
+      .docs;
+  }
 }
