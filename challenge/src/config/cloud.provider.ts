@@ -9,7 +9,7 @@ export const configProviders = [
         endpoint: 'http://10.0.8.8:8082',
         name: 'challenge',
         profiles: ['dev'],
-        label: 'main',
+        label: 'prod',
       };
 
       try {
