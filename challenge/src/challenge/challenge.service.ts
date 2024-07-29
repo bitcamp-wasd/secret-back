@@ -64,34 +64,41 @@ export class ChallengeService {
       .populate('challengeList')
       .exec();
 
+    console.log(challenges);
+
     challenges.forEach((challenge) => {
       if (challenge.voteEndDate >= new Date()) return;
 
-      challenge.state = State.COMPLETE;
-      challenge.save();
-      const challengeList: any = Array(challenge.challengeList).sort(
+      const challengeListItems: any = challenge.challengeList;
+      console.log('--------------------');
+      console.log(challengeListItems);
+      const challengeList: any = challengeListItems.sort(
         (a, b) => b.cnt - a.cnt,
       );
 
       const ranking = new Map();
+      let rank = 0;
+      let count = 0;
 
       for (let i = 0; i < challengeList.length; i++) {
-        let rank = 1;
-        let cnt = 0;
-        if (!ranking.has(rank)) ranking.set(rank, []);
+        if (!ranking.has(rank + 1)) ranking.set(rank + 1, []);
 
-        if (i !== 0 || challengeList[i].cnt === challengeList[i - 1].cnt) {
-          if (cnt >= 3) break;
+        if (i != 0 && challengeList[i].cnt === challengeList[i - 1].cnt) {
+          console.log('rank: ' + rank);
           ranking.get(rank).push(challengeList[i]);
-          cnt += 1;
+          count += 1;
         } else {
-          ranking.get(rank).push(challengeList[i]);
           rank += 1;
-          cnt += 1;
-        }
+          if (count >= 3) break;
+          ranking.get(rank).push(challengeList[i]);
 
-        this.logger.debug(ranking);
+          count += 1;
+        }
       }
+      // challenge.state = State.COMPLETE;
+      // challenge.save();
+      this.logger.debug(ranking);
+      console.log(ranking);
     });
   }
 
