@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: eureka
+
+server:
+  port: 8081
+
+
+eureka:
+  server:
+    wait-time-in-ms-when-sync-empty: 5
+    enable-self-preservation: false
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

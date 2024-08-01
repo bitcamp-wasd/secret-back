@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.battle.mapper.BattleMapper">
+
+    <!-- 종료된 배틀 찾기 -->
+    <select id="findEndBattles" parameterType="map" resultMap="BattleResultMap">
+        SELECT * FROM battle
+        WHERE end_date <![CDATA[<=]]> #{currentDate} AND state = '진행중'
+    </select>
+
+    <update id="updateBattleState">
+        UPDATE battle SET state = #{state}
+        WHERE battle_id = #{battleId}
+    </update>
+
+    <!--  배틀 등록하기 -->
+    <insert id="insertBattle" parameterType="map">
+        INSERT INTO battle (post_id1, post_id2, user_id, title, create_date, end_date, state, vote1_cnt, vote2_cnt, views)
+        VALUES (#{battle.postId1}, #{battle.postId2}, #{userId}, #{battle.title}, #{battle.createDate}, #{battle.endDate}, #{battle.state}, #{battle.vote1Cnt}, #{battle.vote2Cnt}, #{battle.views})
+    </insert>
+
+    <!-- 배틀 정보 가져오기 -->
+    <select id="getBattleById" resultType="com.example.battle.entity.Battle">
+        SELECT battle_id AS battleId, post_id1 AS postId1, post_id2 AS postId2, user_id AS userId,
+               title, create_date AS createDate, end_date AS endDate, state,
+               vote1_cnt AS vote1Cnt, vote2_cnt AS vote2Cnt, views
+        FROM battle WHERE battle_id = #{battleId}
+    </select>
+
+    <!--배틀 조회수 증가-->
+    <update id="incrementViews">
+        UPDATE battle SET views = views +1
+        WHERE battle_id = #{battleId}
+    </update>
+    
+    <!-- 배틀 게시판 삭제 시 관련 데이터 삭제 -->
+    <delete id="deleteCommentsByBattleId">
+        DELETE FROM battle_comment
+        WHERE battle_id = #{battleId}
+    </delete>
+    <delete id="deleteVotesByBattleId">
+        DELETE FROM battle_vote_list
+        WHERE battle_id = #{battleId}
+    </delete>
+    <delete id="deleteBattleByBattleId">
+        DELETE FROM battle
+        WHERE battle_id = #{battleId}
+    </delete>
+
+    <!-- 배틀 투표 -->
+    <insert id="insertBattleVote">
+        INSERT INTO battle_vote_list (battle_id, user_id, post_id)
+        VALUES (#{battleId},#{userId},#{postId})
+    </insert>
+
+    <delete id="deleteBattleVote">
+        DELETE FROM battle_vote_list
+        WHERE battle_id = #{battleId} AND user_id = #{userId}
+    </delete>
+
+    <select id="getBattleVote" resultType="java.lang.Long">
+        SELECT post_id
+        FROM battle_vote_list
+        WHERE battle_id = #{battleId} AND user_id = #{userId}
+    </select>
+
+    <update id="incrementVote1Cnt">
+        UPDATE battle SET vote1_cnt = vote1_cnt + 1
+        WHERE battle_id = #{battleId}
+    </update>
+
+    <update id="decrementVote1Cnt">
+        UPDATE battle SET vote1_cnt = vote1_cnt - 1
+        WHERE battle_id = #{battleId}
+    </update>
+
+    <update id="incrementVote2Cnt">
+        UPDATE battle SET vote2_cnt = vote2_cnt + 1
+        WHERE battle_id = #{battleId}
+    </update>
+
+    <update id="decrementVote2Cnt">
+        update battle SET vote2_cnt = vote2_cnt - 1
+        WHERE battle_id = #{battleId}
+    </update>
+
+    <update id="updateBattleVote">
+        UPDATE battle_vote_list SET post_id = #{postId}
+        WHERE battle_id = #{battleId} AND user_id = #{userId}
+    </update>
+
+    <!--배틀 댓글 -->
+
+    <resultMap id="BattleCommentMap" type="com.example.battle.entity.BattleComment">
+        <id property="battleCommentId" column="battle_comment_id" />
+        <result property="userId" column="user_id" />
+        <result property="createDate" column="create_date" />
+        <result property="comment" column="comment" />
+        <association property="battle" javaType="com.example.battle.entity.Battle">
+            <id property="battleId" column="battle_id"/>
+        </association>
+    </resultMap>
+
+    <insert id="insertComment" parameterType="com.example.battle.entity.BattleComment">
+        INSERT INTO battle_comment (battle_id, user_id, create_date, comment)
+        VALUES (#{battle.battleId}, #{userId}, NOW(), #{comment})
+    </insert>
+
+    <update id="updateComment" parameterType="com.example.battle.entity.BattleComment">
+        UPDATE battle_comment
+        SET comment = #{comment}
+        WHERE battle_comment_id = #{battleCommentId}  AND user_id = #{userId} AND battle_id = #{battle.battleId}
+    </update>
+
+    <delete id="deleteComment">
+        DELETE FROM battle_comment
+        WHERE battle_comment_id = #{battleCommentId} AND user_id = #{userId} AND battle_id = #{battleId}
+    </delete>
+    
+    <select id="countCommentsByBattleId" resultType="int">
+        SELECT COUNT(*) FROM battle_comment
+        WHERE battle_id = #{battleId}
+    </select>
+
+    <select id="getCommentsByBattleId" resultMap="BattleCommentMap">
+        SELECT * FROM battle_comment
+        WHERE battle_id = #{battleId}
+        ORDER BY create_date DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <!-- 마이페이지 댓글 게시판-->
+    <resultMap id="BattleMyCommentResultMap" type="com.example.battle.dto.response.BattleMyCommentDto">
+        <id property="battleCommentId" column="battle_comment_id"/>
+        <result property="comment" column="comment"/>
+        <result property="createDate" column="create_date"/>
+        <result property="battleId" column="battle_id"/>
+        <result property="title" column="title"/>
+    </resultMap>
+
+    <select id="findCommentsByUserId" resultMap="BattleMyCommentResultMap">
+        SELECT bc.battle_comment_id AS battle_comment_id,
+               bc.comment AS comment,
+               bc.create_date AS create_date,
+               bc.battle_id AS battle_id,
+               b.title AS title
+        FROM battle_comment bc
+                 JOIN battle b ON bc.battle_id = b.battle_id
+        WHERE bc.user_id = #{userId}
+        ORDER BY bc.create_date DESC
+            LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countCommentsByUserId" resultType="int">
+        SELECT COUNT(*)
+        FROM battle_comment
+        WHERE user_id = #{userId}
+    </select>
+
+    <delete id="deleteBattleComments">
+        DELETE FROM battle_comment WHERE user_id = #{userId} AND battle_comment_id IN
+        <foreach item="id" collection="battleCommentIds"
+                 open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+
+    <!--배틀 게시판 리스트-->
+    <resultMap id="BattleResultMap" type="com.example.battle.entity.Battle">
+        <id property="battleId" column="battle_id" />
+        <result property="title" column="title" />
+        <result property="views" column="views" />
+        <result property="userId" column="user_id"/>
+        <result property="endDate" column="end_date" />
+        <result property="vote1Cnt" column="vote1_cnt" />
+        <result property="vote2Cnt" column="vote2_cnt" />
+        <result property="postId1" column="post_id1" />
+        <result property="postId2" column="post_id2" />
+    </resultMap>
+
+
+    <select id="findByStateBattle" parameterType="map" resultMap="BattleResultMap">
+        SELECT * FROM battle
+        WHERE state = #{state}
+        ORDER BY create_date DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+    
+    <select id="countByState"  parameterType="string" resultType="int">
+        SELECT COUNT(*) FROM battle
+        WHERE state = #{state}
+    </select>
+
+    <select id="findByMyBattle" parameterType="map" resultMap="BattleResultMap">
+        SELECT * FROM battle
+        WHERE user_id = #{userId}
+        ORDER BY create_date DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countByMyBattle" parameterType="long" resultType="int">
+        SELECT COUNT(*) FROM battle
+        WHERE user_id = #{userId}
+    </select>
+    
+    <update id="updatePostId1ToNull">
+        UPDATE battle
+        SET post_id1 = NULL
+        WHERE battle_id = #{battleId}
+    </update>
+
+    <update id="updatePostId2ToNull">
+        UPDATE battle
+        SET post_id2 = NULL
+        WHERE battle_id = #{battleId}
+    </update>
+
+</mapper>
